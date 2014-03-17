@@ -5,10 +5,4 @@ include COPYRIGHT
 include CHANGELOG
 include LICENSE
 include tryton.cfg
-include *.xml
-include view/*.xml
-include *.odt
-include locale/*.po
 include doc/*
-include icons/*
-include tests/*.rst
