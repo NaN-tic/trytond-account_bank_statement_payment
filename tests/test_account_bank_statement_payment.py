@@ -18,9 +18,9 @@ from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
 from trytond.transaction import Transaction
 
 
-class TestCase(unittest.TestCase):
+class AccountBankStatementPaymentTestCase(unittest.TestCase):
     '''
-    Test module.
+    Test Account Bank Statement Payment module.
     '''
 
     def setUp(self):
@@ -182,7 +182,8 @@ def suite():
         class_name = test.__class__.__name__
         if test not in suite and class_name != 'DocFileCase':
             suite.addTest(test)
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCase))
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
+        AccountBankStatementPaymentTestCase))
     return suite
 
 if __name__ == '__main__':
