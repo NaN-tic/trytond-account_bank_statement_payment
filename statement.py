@@ -87,7 +87,7 @@ class Group:
         Operator = fields.SQL_OPERATORS[operator]
         payment = Payment.__table__()
 
-        amount = Sum(payment.amount)
+        amount = Sum(Payment.amount.sql_column(payment))
         value = cls.total_amount.sql_format(value)
 
         query = payment.select(payment.group,
