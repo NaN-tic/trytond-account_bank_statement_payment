@@ -34,7 +34,7 @@ class StatementLine:
         for group in Group.search(domain):
             append = True
             for payment in group.payments:
-                if payment.line.reconciliation:
+                if payment.line and payment.line.reconciliation:
                     append = False
                     break
             if append:
@@ -55,7 +55,7 @@ class StatementLine:
                     move_line.account = getattr(payment.party, 'account_%s' %
                         kind)
                 move_line.party = payment.party
-                move_line.amount = amount
+                move_line.amount = payment.amount
                 move_line.date = datetime.date(self.date.year, self.date.month,
                     self.date.day)
                 move_line.line = self
@@ -88,7 +88,7 @@ class Group:
         payment = Payment.__table__()
 
         amount = Sum(Payment.amount.sql_column(payment))
-        value = cls.total_amount.sql_format(value)
+        value = Payment.amount._domain_value(operator, value)
 
         query = payment.select(payment.group,
                 group_by=(payment.group),

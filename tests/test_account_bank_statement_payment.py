@@ -170,7 +170,7 @@ class AccountBankStatementPaymentTestCase(unittest.TestCase):
             self.assertEqual(statement_line.moves_amount, Decimal('0.0'))
             self.statement_line.search_reconcile([statement_line])
             self.assertEqual(statement_line.moves_amount, Decimal('110.0'))
-            self.assertEqual(statement_line.counterpart_lines, [line])
+            self.assertEqual(list(statement_line.counterpart_lines), [line])
             self.assertEqual(len(statement_line.lines), 1)
 
 
