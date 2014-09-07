@@ -30,37 +30,37 @@ class StatementLine:
             ('kind', '=', kind),
             ('total_amount', '=', search_amount),
             ]
-        groups = []
+        payments = []
         for group in Group.search(domain):
-            append = True
+            found = True
             for payment in group.payments:
                 if payment.line and payment.line.reconciliation:
-                    append = False
+                    found = False
                     break
-            if append:
-                groups.append(group)
+            if found:
+                payments = group.payments
+                break
 
-        for group in groups:
-            for payment in group.payments:
-                move_line = MoveLine()
-                if payment.line:
-                    line_amount = abs(payment.line.debit - payment.line.credit)
-                    if line_amount == payment.amount:
-                        line = payment.line
-                        line.bank_statement_line_counterpart = self
-                        line.save()
-                        continue
-                    move_line.account = payment.line.account
-                else:
-                    move_line.account = getattr(payment.party, 'account_%s' %
-                        kind)
-                move_line.party = payment.party
-                move_line.amount = payment.amount
-                move_line.date = datetime.date(self.date.year, self.date.month,
-                    self.date.day)
-                move_line.line = self
-                move_line.description = payment.description
-                move_line.save()
+        for payment in payments:
+            move_line = MoveLine()
+            if payment.line:
+                line_amount = abs(payment.line.debit - payment.line.credit)
+                if line_amount == payment.amount:
+                    line = payment.line
+                    line.bank_statement_line_counterpart = self
+                    line.save()
+                    continue
+                move_line.account = payment.line.account
+            else:
+                move_line.account = getattr(payment.party, 'account_%s' %
+                    kind)
+            move_line.party = payment.party
+            move_line.amount = payment.amount
+            move_line.date = datetime.date(self.date.year, self.date.month,
+                self.date.day)
+            move_line.line = self
+            move_line.description = payment.description
+            move_line.save()
 
     def _search_reconciliation(self):
         super(StatementLine, self)._search_reconciliation()
