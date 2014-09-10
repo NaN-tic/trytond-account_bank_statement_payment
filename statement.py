@@ -15,14 +15,16 @@ _ZERO = Decimal('0.0')
 class StatementLine:
     __name__ = 'account.bank.statement.line'
 
-    def _search_payments_reconciliation(self):
+    def _search_payments(self, amount):
+        """
+        Return a list of payments from payment group with total equal to amount
+        """
         pool = Pool()
         Group = pool.get('account.payment.group')
-        MoveLine = pool.get('account.bank.statement.move.line')
-        amount = self.company_amount - self.moves_amount
+
         search_amount = abs(amount)
         if search_amount == _ZERO:
-            return
+            return []
 
         kind = 'receivable' if amount > _ZERO else 'payable'
         domain = [
@@ -40,6 +42,15 @@ class StatementLine:
             if found:
                 payments = group.payments
                 break
+        return payments
+
+    def _search_payments_reconciliation(self):
+        pool = Pool()
+        MoveLine = pool.get('account.bank.statement.move.line')
+
+        amount = self.company_amount - self.moves_amount
+        kind = 'receivable' if amount > _ZERO else 'payable'
+        payments = self._search_payments(amount)
 
         for payment in payments:
             move_line = MoveLine()
