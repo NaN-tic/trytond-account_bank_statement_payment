@@ -86,12 +86,10 @@ class Group:
         _, operator, value = clause
         Operator = fields.SQL_OPERATORS[operator]
         payment = Payment.__table__()
-
-        amount = Sum(Payment.amount.sql_column(payment))
         value = Payment.amount._domain_value(operator, value)
 
         query = payment.select(payment.group,
                 group_by=(payment.group),
-                having=Operator(amount, value)
+                having=Operator(Sum(payment.amount), value)
                 )
         return [('id', 'in', query)]
