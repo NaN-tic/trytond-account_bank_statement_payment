@@ -6,13 +6,14 @@ from decimal import Decimal
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 
-__metaclass__ = PoolMeta
+
 __all__ = ['StatementLine', 'Group']
 
 _ZERO = Decimal('0.0')
 
 
 class StatementLine:
+    __metaclass__ = PoolMeta
     __name__ = 'account.bank.statement.line'
 
     def _search_payments(self, amount):
@@ -79,6 +80,7 @@ class StatementLine:
 
 
 class Group:
+    __metaclass__ = PoolMeta
     __name__ = 'account.payment.group'
 
     total_amount = fields.Function(fields.Numeric('Total Amount'),
