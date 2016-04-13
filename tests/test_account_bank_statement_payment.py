@@ -5,70 +5,71 @@ from decimal import Decimal
 import datetime
 import doctest
 import unittest
+from trytond.pool import Pool
 import trytond.tests.test_tryton
-from trytond.tests.test_tryton import ModuleTestCase
-from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
-from trytond.transaction import Transaction
+from trytond.tests.test_tryton import ModuleTestCase, with_transaction
+
+from trytond.modules.company.tests import create_company, set_company
+from trytond.modules.account.tests import create_chart, get_fiscalyear
+from trytond.modules.account_invoice.tests import set_invoice_sequences
 
 
 class AccountBankStatementPaymentTestCase(ModuleTestCase):
     'Test Account Bank Statement Payment module'
     module = 'account_bank_statement_payment'
 
-    def setUp(self):
-        super(AccountBankStatementPaymentTestCase, self).setUp()
-        self.account = POOL.get('account.account')
-        self.company = POOL.get('company.company')
-        self.user = POOL.get('res.user')
-        self.date = POOL.get('ir.date')
-        self.party = POOL.get('party.party')
-        self.party_address = POOL.get('party.address')
-        self.fiscalyear = POOL.get('account.fiscalyear')
-        self.move = POOL.get('account.move')
-        self.line = POOL.get('account.move.line')
-        self.journal = POOL.get('account.journal')
-        self.payment_journal = POOL.get('account.payment.journal')
-        self.statement_journal = POOL.get('account.bank.statement.journal')
-        self.payment = POOL.get('account.payment')
-        self.group = POOL.get('account.payment.group')
-        self.period = POOL.get('account.period')
-        self.pay_line = POOL.get('account.move.line.pay', type='wizard')
-        self.statement = POOL.get('account.bank.statement')
-        self.statement_line = POOL.get('account.bank.statement.line')
-
-
-    def test0010_bank_reconciliation(self):
+    @with_transaction()
+    def test_bank_reconciliation(self):
         'Test bank reconciliation'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            fiscalyear, = self.fiscalyear.search([])
+        pool = Pool()
+        Date = pool.get('ir.date')
+        FiscalYear = pool.get('account.fiscalyear')
+        Journal = pool.get('account.journal')
+        Account = pool.get('account.account')
+        Party = pool.get('party.party')
+        Move = pool.get('account.move')
+        Line = pool.get('account.move.line')
+        PaymentJournal = pool.get('account.payment.journal')
+        Payment = pool.get('account.payment')
+        Group = pool.get('account.payment.group')
+        StatementJournal = pool.get('account.bank.statement.journal')
+        Statement = pool.get('account.bank.statement')
+        StatementLine = pool.get('account.bank.statement.line')
+
+        company = create_company()
+        with set_company(company):
+            create_chart(company)
+            fiscalyear = set_invoice_sequences(get_fiscalyear(company))
+            fiscalyear.save()
+            FiscalYear.create_period([fiscalyear])
             period = fiscalyear.periods[0]
-            payment_journal, = self.payment_journal.create([{
+            payment_journal, = PaymentJournal.create([{
                         'name': 'Manual',
                         'process_method': 'manual',
                         }])
-            journal_revenue, = self.journal.search([
+            journal_revenue, = Journal.search([
                     ('code', '=', 'REV'),
                     ])
-            revenue, = self.account.search([
+            revenue, = Account.search([
                     ('kind', '=', 'revenue'),
                     ])
-            receivable, = self.account.search([
+            receivable, = Account.search([
                     ('kind', '=', 'receivable'),
                     ])
-            expense, = self.account.search([
+            expense, = Account.search([
                     ('kind', '=', 'expense'),
                     ])
-            payable, = self.account.search([
+            payable, = Account.search([
                     ('kind', '=', 'payable'),
                     ])
-            cash, = self.account.search([
+            cash, = Account.search([
                     ('kind', '=', 'other'),
                     ('name', '=', 'Main Cash'),
                     ])
             cash.bank_reconcile = True
             cash.save()
             #Create some parties
-            customer1, customer2, supplier1, supplier2 = self.party.create([{
+            customer1, customer2, supplier1, supplier2 = Party.create([{
                             'name': 'customer1',
                         }, {
                             'name': 'customer2',
@@ -95,53 +96,53 @@ class AccountBankStatementPaymentTestCase(ModuleTestCase):
                         ],
                     },
                 ]
-            moves = self.move.create(vlist)
-            self.move.post(moves)
+            moves = Move.create(vlist)
+            Move.post(moves)
 
-            line, = self.line.search([
+            line, = Line.search([
                     ('account', '=', receivable)
                     ])
-            payments = self.payment.create([
+            payments = Payment.create([
                     {
                         'journal': payment_journal.id,
                         'party': line.party.id,
                         'kind': 'receivable',
                         'amount': line.payment_amount,
                         'line': line,
-                        'date': self.date.today(),
+                        'date': Date.today(),
                         },
                     {
                         'journal': payment_journal.id,
                         'party': line.party.id,
                         'kind': 'receivable',
                         'amount': Decimal('10.0'),
-                        'date': self.date.today(),
+                        'date': Date.today(),
                         },
                     ])
 
             self.assertEqual(sum([p.amount for p in payments]),
                 Decimal('110.0'))
-            self.payment.approve(payments)
-            group, = self.group.create([{
+            Payment.approve(payments)
+            group, = Group.create([{
                         'kind': 'receivable',
                         'journal': payment_journal.id,
                         }])
-            self.payment.process(payments, lambda: group)
+            Payment.process(payments, lambda: group)
 
             self.assertEqual(all([p.state == 'processing' for p in payments]),
                     True)
 
-            cash_journal, = self.journal.copy([journal_revenue], {
+            cash_journal, = Journal.copy([journal_revenue], {
                         'type': 'cash',
                         'credit_account': cash.id,
                         'debit_account': cash.id,
                     })
 
-            statement_journal, = self.statement_journal.create([{
+            statement_journal, = StatementJournal.create([{
                         'name': 'Bank',
                         'journal': cash_journal.id,
                         }])
-            statement, = self.statement.create([{
+            statement, = Statement.create([{
                         'journal': statement_journal.id,
                         'date': datetime.datetime.now(),
                         'lines': [
@@ -152,11 +153,11 @@ class AccountBankStatementPaymentTestCase(ModuleTestCase):
                                         }]),
                             ],
                         }])
-            self.statement.confirm([statement])
+            Statement.confirm([statement])
             statement_line, = statement.lines
             self.assertEqual(statement_line.company_amount, Decimal('110.0'))
             self.assertEqual(statement_line.moves_amount, Decimal('0.0'))
-            self.statement_line.search_reconcile([statement_line])
+            StatementLine.search_reconcile([statement_line])
             self.assertEqual(statement_line.moves_amount, Decimal('110.0'))
             self.assertEqual(list(statement_line.counterpart_lines), [line])
             self.assertEqual(len(statement_line.lines), 1)
