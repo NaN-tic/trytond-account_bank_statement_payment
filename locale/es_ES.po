@@ -14,10 +14,6 @@ msgctxt "field:account.move.line,payment_group:"
 msgid "Payment Group"
 msgstr "Grupo de pagos"
 
-msgctxt "field:account.payment.group,total_amount:"
-msgid "Total Amount"
-msgstr "Total"
-
 msgctxt "view:account.move.line:"
 msgid "Account Move Lines"
 msgstr "Apuntes contables"
