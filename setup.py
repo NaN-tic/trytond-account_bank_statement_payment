@@ -8,7 +8,10 @@ import ConfigParser
 
 MODULE = 'account_bank_statement_payment'
 PREFIX = 'trytonspain'
-MODULE2PREFIX = {}
+MODULE2PREFIX = {
+    'account_bank_statement_account': 'trytonspain',
+    'account_bank_statement_counterpart': 'trytonspain',
+    }
 
 
 def read(fname):
