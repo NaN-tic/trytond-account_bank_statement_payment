@@ -3,10 +3,12 @@
 # copyright notices and license terms.
 from decimal import Decimal
 import datetime
+import doctest
 import unittest
 import trytond.tests.test_tryton
 from trytond.tests.test_tryton import test_depends
 from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
+from trytond.tests.test_tryton import doctest_setup, doctest_teardown
 from trytond.transaction import Transaction
 
 
@@ -168,14 +170,19 @@ class AccountBankStatementPaymentTestCase(unittest.TestCase):
 
 def suite():
     suite = trytond.tests.test_tryton.suite()
-    from trytond.modules.account.tests import test_account
-    for test in test_account.suite():
-        #Skip doctest
-        class_name = test.__class__.__name__
-        if test not in suite and class_name != 'DocFileCase':
-            suite.addTest(test)
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
-        AccountBankStatementPaymentTestCase))
+    # from trytond.modules.account.tests import test_account
+    # for test in test_account.suite():
+    #     # Skip doctest
+    #     class_name = test.__class__.__name__
+    #     if test not in suite and class_name != 'DocFileCase':
+    #         suite.addTest(test)
+    # suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
+    #     AccountBankStatementPaymentTestCase))
+    suite.addTests(doctest.DocFileSuite(
+            'scenario_bank_statement_payment_bank_discount.rst',
+            # setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
+            setUp=doctest_setup, encoding='utf-8',
+            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
     return suite
 
 if __name__ == '__main__':
