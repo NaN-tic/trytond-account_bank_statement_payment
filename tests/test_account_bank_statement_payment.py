@@ -8,6 +8,7 @@ import unittest
 from trytond.pool import Pool
 import trytond.tests.test_tryton
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
+from trytond.tests.test_tryton import doctest_setup, doctest_teardown
 
 from trytond.modules.company.tests import create_company, set_company
 from trytond.modules.account.tests import create_chart, get_fiscalyear
@@ -171,4 +172,8 @@ def suite():
             suite.addTest(test)
     suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
         AccountBankStatementPaymentTestCase))
+    # suite.addTests(doctest.DocFileSuite(
+    #         'scenario_bank_statement_payment_bank_discount.rst',
+    #         setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
+    #         optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
     return suite
