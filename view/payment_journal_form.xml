@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/label[@name='clearing_account']" position="before">
+        <!-- TODO: it should go to account_payment_clearing -->
+        <separator id="clearing" string="Clearing" colspan="4"/>
+    </xpath>
+    <xpath expr="/form/field[@name='clearing_journal']" position="after">
+        <label name="clearing_percent"/>
+        <group id="clearing_percent" col="3">
+            <field name="clearing_percent" factor="100" xexpand="0" xfill="0"/>
+            <label name="clearing_percent" string="%" xalign="0.0" xexpand="1" xfill="1"/>
+        </group>
+        <newline/>
+    </xpath>
+</data>
