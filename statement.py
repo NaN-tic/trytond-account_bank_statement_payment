@@ -230,13 +230,18 @@ class StatementMoveLine:
                 advancement_amount = pending_amount = None
 
             if (self.payment.state in ('processing', 'succeeded')
+                    and not self.payment.journal.advance
                     and ((self.amount == -payment_amount)
                         or (advancement_amount
                             and self.amount == -advancement_amount))):
                 Payment.fail([self.payment])
             elif (self.payment.state in ('processing', 'failed')
-                    and self.account == self.payment.line.account
-                    and self.amount == pending_amount):
+                    and ((self.account == self.payment.line.account
+                            and self.amount == pending_amount)
+                        or (self.payment.journal.advance
+                            and self.account
+                            != self.payment.journal.clearing_account
+                            and self.amount == payment_amount))):
                 Payment.succeed([self.payment])
 
             if (self.payment.clearing_move
@@ -247,6 +252,16 @@ class StatementMoveLine:
             lines = move.lines + (self.payment.line,)
             if self.payment.clearing_move:
                 lines += self.payment.clearing_move.lines
+            elif (self.payment.journal.clearing_account
+                    and self.payment.journal.advance
+                    and self.account == self.payment.journal.clearing_account):
+                for statement_move_line in self.search([
+                            ('payment', '=', self.payment),
+                            ('account', '=', self.account),
+                            ('line.state', '=', 'posted'),
+                            ]):
+                    lines += statement_move_line.move.lines
+
             for line in lines:
                 if line.account.reconcile and not line.reconciliation:
                     key = (
@@ -257,6 +272,11 @@ class StatementMoveLine:
                 if not sum((l.debit - l.credit) for l in lines):
                     MoveLine.reconcile(lines)
         return move
+
+    def _check_invoice_amount_to_pay(self):
+        if self.payment and self.payment.journal.advance:
+            return
+        super(StatementMoveLine, self)._check_invoice_amount_to_pay()
 
     def _get_move(self):
         move = super(StatementMoveLine, self)._get_move()
