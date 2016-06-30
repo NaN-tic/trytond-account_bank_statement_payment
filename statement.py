@@ -153,6 +153,7 @@ class StatementMoveLine:
             if payments:
                 changes['payment'] = payments[0].id
                 changes['payment.rec_name'] = payments[0].rec_name
+                self.payment = payments[0]
         return changes
 
     @fields.depends('payment', 'party', 'account', 'amount',
@@ -257,6 +258,12 @@ class StatementMoveLine:
             for lines in to_reconcile.itervalues():
                 if not sum((l.debit - l.credit) for l in lines):
                     MoveLine.reconcile(lines)
+        return move
+
+    def _get_move(self):
+        move = super(StatementMoveLine, self)._get_move()
+        if move and self.payment:
+            move.origin = self.payment
         return move
 
     @classmethod
