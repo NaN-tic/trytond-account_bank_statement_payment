@@ -12,6 +12,8 @@
             <field name="clearing_percent" factor="100" xexpand="0" xfill="0"/>
             <label name="clearing_percent" string="%" xalign="0.0" xexpand="1" xfill="1"/>
         </group>
+        <label name="advance"/>
+        <field name="advance"/>
         <newline/>
     </xpath>
 </data>
