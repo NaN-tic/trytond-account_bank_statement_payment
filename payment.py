@@ -1,9 +1,10 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
+from collections import defaultdict
 from decimal import Decimal
 from sql.aggregate import Sum
 
-from trytond.model import fields
+from trytond.model import ModelView, Workflow, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Eval, Bool
 
@@ -68,6 +69,40 @@ class Group:
 class Payment:
     __name__ = 'account.payment'
     __metaclass__ = PoolMeta
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('succeeded')
+    def succeed(cls, payments):
+        pool = Pool()
+        Line = pool.get('account.move.line')
+        StatementMoveLine = pool.get('account.bank.statement.move.line')
+
+        super(Payment, cls).succeed(payments)
+
+        for payment in payments:
+            if (payment.journal.clearing_account
+                    and payment.journal.clearing_account.reconcile
+                    and payment.clearing_move):
+                statement_move_lines = StatementMoveLine.search([
+                        ('payment', '=', payment),
+                        ('account', '=', payment.journal.clearing_account),
+                        ('line.state', '=', 'posted'),
+                        ])
+                if statement_move_lines:
+                    to_reconcile = defaultdict(list)
+                    lines = payment.clearing_move.lines
+                    for sml in statement_move_lines:
+                        lines += sml.move.lines
+                    for line in lines:
+                        if line.account.reconcile and not line.reconciliation:
+                            key = (
+                                line.account.id,
+                                line.party.id if line.party else None)
+                            to_reconcile[key].append(line)
+                    for lines in to_reconcile.itervalues():
+                        if not sum((l.debit - l.credit) for l in lines):
+                            Line.reconcile(lines)
 
     def create_clearing_move(self, date=None):
         move = super(Payment, self).create_clearing_move(date=date)
