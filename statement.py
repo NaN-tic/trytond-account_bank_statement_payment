@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
-from trytond.pyson import Eval, If, Bool
+from trytond.pyson import Bool, Eval, If
 from trytond.transaction import Transaction
 
 __all__ = ['StatementLine', 'StatementMoveLine']
@@ -101,6 +101,15 @@ class StatementMoveLine:
                     ('state', 'in', ['processing', 'failed']))),
             ],
         depends=['party'])
+
+    @classmethod
+    def __setup__(cls):
+        super(StatementMoveLine, cls).__setup__()
+        for clause in cls.invoice.domain:
+            if (isinstance(clause, If)
+                    and clause._condition == Bool(Eval('account'))):
+                clause._condition = (Bool(Eval('account'))
+                    & ~Bool(Eval('payment')))
 
     @fields.depends('line')
     def on_change_with_line_state(self, name=None):
