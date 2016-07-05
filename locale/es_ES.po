@@ -6,6 +6,14 @@ msgctxt "field:account.payment.group,total_amount:"
 msgid "Total Amount"
 msgstr "Total"
 
+msgctxt "field:account.bank.statement.move.line,line_state:"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "field:account.bank.statement.move.line,payment:"
+msgid "Payment"
+msgstr "Pago"
+
 msgctxt "field:account.move.line,payment_date:"
 msgid "Payment Date"
 msgstr "Fecha pago"
@@ -14,6 +22,54 @@ msgctxt "field:account.move.line,payment_group:"
 msgid "Payment Group"
 msgstr "Grupo de pagos"
 
+msgctxt "field:account.payment.journal,advance:"
+msgid "Advance"
+msgstr "Anticipo"
+
+msgctxt "field:account.payment.journal,clearing_percent:"
+msgid "Bank Discount Percent"
+msgstr "Porcentaje descuento bancario"
+
+msgctxt "help:account.payment.journal,advance:"
+msgid ""
+"The Bank only advances the Due amount and it recover it at due date, "
+"indepently if the customer pays you."
+msgstr ""
+"El banco solo anticipa el importe del vencimiento y lo recupera cuando este "
+"vence, independientemente de si el cliente paga."
+
+msgctxt "help:account.payment.journal,clearing_percent:"
+msgid ""
+"The percentage over the total owed amount that will be moved to Clearing "
+"Accoung when the payment is succeeded."
+msgstr ""
+"El porcentajo sobre el importe total del vencimiento que se moverá a la "
+"cuenta de liquidación cuando el pago sea exitoso."
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Canceled"
+msgstr "Cancelado"
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Confirmed"
+msgstr "Confirmado"
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Posted"
+msgstr "Contabilizado"
+
 msgctxt "view:account.move.line:"
 msgid "Account Move Lines"
 msgstr "Apuntes contables"
+
+msgctxt "view:account.payment.journal:"
+msgid "%"
+msgstr "%"
+
+msgctxt "view:account.payment.journal:"
+msgid "Clearing"
+msgstr "Liquidacion"
