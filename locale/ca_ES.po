@@ -6,6 +6,14 @@ msgctxt "field:account.payment.group,total_amount:"
 msgid "Total Amount"
 msgstr "Total"
 
+msgctxt "field:account.bank.statement.move.line,line_state:"
+msgid "State"
+msgstr "Estat"
+
+msgctxt "field:account.bank.statement.move.line,payment:"
+msgid "Payment"
+msgstr "Pagament"
+
 msgctxt "field:account.move.line,payment_date:"
 msgid "Payment Date"
 msgstr "Data pagament"
@@ -14,6 +22,54 @@ msgctxt "field:account.move.line,payment_group:"
 msgid "Payment Group"
 msgstr "Grup de pagaments"
 
+msgctxt "field:account.payment.journal,advance:"
+msgid "Advance"
+msgstr "Acompte"
+
+msgctxt "field:account.payment.journal,clearing_percent:"
+msgid "Bank Discount Percent"
+msgstr "Percentatge descompte bancari"
+
+msgctxt "help:account.payment.journal,advance:"
+msgid ""
+"The Bank only advances the Due amount and it recover it at due date, "
+"indepently if the customer pays you."
+msgstr ""
+"El banc només avança l'import del venciment i el recupera quan aquest ha "
+"vençut, independentment de si el client paga."
+
+msgctxt "help:account.payment.journal,clearing_percent:"
+msgid ""
+"The percentage over the total owed amount that will be moved to Clearing "
+"Accoung when the payment is succeeded."
+msgstr ""
+"El percentatge sobre el total de l'import del venciment que es mourà al "
+"compte de liquidació quan el pagament sigui exitós."
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Canceled"
+msgstr "Cancel·lat"
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Confirmed"
+msgstr "Confirmat"
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Draft"
+msgstr "Esborrany"
+
+msgctxt "selection:account.bank.statement.move.line,line_state:"
+msgid "Posted"
+msgstr "Confirmat"
+
 msgctxt "view:account.move.line:"
 msgid "Account Move Lines"
 msgstr "Apunts comptables"
+
+msgctxt "view:account.payment.journal:"
+msgid "%"
+msgstr "%"
+
+msgctxt "view:account.payment.journal:"
+msgid "Clearing"
+msgstr "Liquidació"
