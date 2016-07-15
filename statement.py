@@ -100,7 +100,7 @@ class StatementMoveLine:
                     ('state', 'in', ['processing', 'succeeded']),
                     ('state', 'in', ['processing', 'failed']))),
             ],
-        depends=['party'])
+        depends=['party', 'line_state', 'amount'])
 
     @classmethod
     def __setup__(cls):
