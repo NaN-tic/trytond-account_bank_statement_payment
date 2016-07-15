@@ -119,40 +119,34 @@ class StatementMoveLine:
 
     @fields.depends('party', 'payment', methods=['account'])
     def on_change_party(self):
-        changes = super(StatementMoveLine, self).on_change_party()
+        original_account = self.account
+        super(StatementMoveLine, self).on_change_party()
         if self.payment:
             if self.payment.party != self.party:
-                changes['payment'] = None
                 self.payment = None
-            elif changes.get('account'):
-                changes.update(self.on_change_account())
-        return changes
+            elif self.account != original_account:
+                self.on_change_account()
 
     @fields.depends('account', 'payment')
     def on_change_account(self):
-        changes = super(StatementMoveLine, self).on_change_account()
+        super(StatementMoveLine, self).on_change_account()
         if self.payment:
             clearing_account = self.payment.journal.clearing_account
             if self.account != clearing_account:
-                changes['payment'] = None
                 self.payment = None
-        return changes
 
     @fields.depends('payment')
     def on_change_invoice(self):
         pool = Pool()
         Payment = pool.get('account.payment')
-        changes = super(StatementMoveLine, self).on_change_invoice()
+        super(StatementMoveLine, self).on_change_invoice()
         if self.invoice and not self.payment:
             payments = Payment.search([
                     ('state', '=', 'processing'),
                     ('line.origin', '=', str(self.invoice)),
                     ])
             if payments:
-                changes['payment'] = payments[0].id
-                changes['payment.rec_name'] = payments[0].rec_name
                 self.payment = payments[0]
-        return changes
 
     @fields.depends('payment', 'party', 'account', 'amount',
         '_parent_line._parent_statement.journal',
@@ -161,11 +155,8 @@ class StatementMoveLine:
         pool = Pool()
         Currency = pool.get('currency.currency')
         Invoice = pool.get('account.invoice')
-        changes = {}
         if self.payment:
             if not self.party:
-                changes['party'] = self.payment.party.id
-                changes['party.rec_name'] = self.payment.party.rec_name
                 self.party = self.payment.party
             clearing_account = self.payment.journal.clearing_account
             if not self.account and clearing_account:
@@ -173,16 +164,11 @@ class StatementMoveLine:
                 if self.payment.journal.clearing_percent < Decimal(1):
                     if self.payment.clearing_move:
                         if isinstance(self.payment.line.origin, Invoice):
-                            changes['invoice'] = self.payment.line.origin.id
                             self.invoice = self.payment.line.origin
-                            changes.update(self.on_change_invoice())
+                            self.on_change_invoice()
                     else:
-                        changes['account'] = clearing_account.id
-                        changes['account.rec_name'] = clearing_account.rec_name
                         self.account = clearing_account
                 else:
-                    changes['account'] = clearing_account.id
-                    changes['account.rec_name'] = clearing_account.rec_name
                     self.account = clearing_account
             if (not self.amount and self.line.statement
                     and self.line.statement.journal):
@@ -198,12 +184,9 @@ class StatementMoveLine:
                             - self.payment.journal.clearing_percent)
                     else:
                         amount *= self.payment.journal.clearing_percent
-                changes['amount'] = amount
                 self.amount = amount
                 if self.payment.kind == 'payable':
-                    changes['amount'] *= -1
                     self.amount *= -1
-        return changes
 
     def create_move(self):
         pool = Pool()
