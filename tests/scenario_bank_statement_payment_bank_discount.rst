@@ -9,6 +9,12 @@ Imports::
     >>> from decimal import Decimal
     >>> from operator import attrgetter
     >>> from proteus import config, Model, Wizard
+    >>> from trytond.modules.company.tests.tools import create_company, \
+    ...     get_company
+    >>> from trytond.modules.account.tests.tools import create_fiscalyear, \
+    ...     create_chart, get_accounts, create_tax, set_tax_code
+    >>> from trytond.modules.account_invoice.tests.tools import \
+    ...     set_fiscalyear_invoice_sequences
     >>> today = datetime.date.today()
     >>> now = datetime.datetime.now()
 
@@ -19,121 +25,49 @@ Create database::
 
 Install account_bank_statement_payment::
 
-    >>> Module = Model.get('ir.module.module')
-    >>> account_bank_module, = Module.find(
+    >>> Module = Model.get('ir.module')
+    >>> module, = Module.find(
     ...     [('name', '=', 'account_bank_statement_payment')])
-    >>> Module.install([account_bank_module.id], config.context)
-    >>> Wizard('ir.module.module.install_upgrade').execute('upgrade')
+    >>> module.click('install')
+    >>> Wizard('ir.module.install_upgrade').execute('upgrade')
 
 Create company::
 
-    >>> Currency = Model.get('currency.currency')
-    >>> CurrencyRate = Model.get('currency.currency.rate')
-    >>> currencies = Currency.find([('code', '=', 'USD')])
-    >>> if not currencies:
-    ...     currency = Currency(name='US Dollar', symbol=u'$', code='USD',
-    ...         rounding=Decimal('0.01'), mon_grouping='[]',
-    ...         mon_decimal_point='.')
-    ...     currency.save()
-    ...     CurrencyRate(date=today + relativedelta(month=1, day=1),
-    ...         rate=Decimal('1.0'), currency=currency).save()
-    ... else:
-    ...     currency, = currencies
-    >>> Company = Model.get('company.company')
-    >>> Party = Model.get('party.party')
-    >>> company_config = Wizard('company.company.config')
-    >>> company_config.execute('company')
-    >>> company = company_config.form
-    >>> party = Party(name='Dunder Mifflin')
-    >>> party.save()
-    >>> company.party = party
-    >>> company.currency = currency
-    >>> company_config.execute('add')
-    >>> company, = Company.find([])
-
-Reload the context::
-
-    >>> User = Model.get('res.user')
-    >>> config._context = User.get_preferences(True, config.context)
+    >>> _ = create_company()
+    >>> company = get_company()
 
 Create fiscal year::
 
-    >>> FiscalYear = Model.get('account.fiscalyear')
-    >>> Sequence = Model.get('ir.sequence')
-    >>> SequenceStrict = Model.get('ir.sequence.strict')
-    >>> fiscalyear = FiscalYear(name=str(today.year))
-    >>> fiscalyear.start_date = today + relativedelta(month=1, day=1)
-    >>> fiscalyear.end_date = today + relativedelta(month=12, day=31)
-    >>> fiscalyear.company = company
-    >>> post_move_seq = Sequence(name=str(today.year), code='account.move',
-    ...     company=company)
-    >>> post_move_seq.save()
-    >>> fiscalyear.post_move_sequence = post_move_seq
-    >>> invoice_seq = SequenceStrict(name=str(today.year),
-    ...     code='account.invoice', company=company)
-    >>> invoice_seq.save()
-    >>> fiscalyear.out_invoice_sequence = invoice_seq
-    >>> fiscalyear.in_invoice_sequence = invoice_seq
-    >>> fiscalyear.out_credit_note_sequence = invoice_seq
-    >>> fiscalyear.in_credit_note_sequence = invoice_seq
-    >>> fiscalyear.save()
-    >>> FiscalYear.create_period([fiscalyear.id], config.context)
+    >>> fiscalyear = set_fiscalyear_invoice_sequences(
+    ...     create_fiscalyear(company))
+    >>> fiscalyear.click('create_period')
+    >>> period = fiscalyear.periods[0]
 
 Create chart of accounts::
 
-    >>> AccountTemplate = Model.get('account.account.template')
-    >>> Account = Model.get('account.account')
-    >>> account_template, = AccountTemplate.find([('parent', '=', None)])
-    >>> create_chart = Wizard('account.create_chart')
-    >>> create_chart.execute('account')
-    >>> create_chart.form.account_template = account_template
-    >>> create_chart.form.company = company
-    >>> create_chart.execute('create_account')
-    >>> receivable, = Account.find([
-    ...         ('kind', '=', 'receivable'),
-    ...         ('company', '=', company.id),
-    ...         ])
-    >>> payable, = Account.find([
-    ...         ('kind', '=', 'payable'),
-    ...         ('company', '=', company.id),
-    ...         ])
-    >>> revenue, = Account.find([
-    ...         ('kind', '=', 'revenue'),
-    ...         ('company', '=', company.id),
-    ...         ])
-    >>> expense, = Account.find([
-    ...         ('kind', '=', 'expense'),
-    ...         ('company', '=', company.id),
-    ...         ])
-    >>> account_tax, = Account.find([
-    ...         ('kind', '=', 'other'),
-    ...         ('company', '=', company.id),
-    ...         ('name', '=', 'Main Tax'),
-    ...         ])
-    >>> cash, = Account.find([
-    ...         ('kind', '=', 'other'),
-    ...         ('company', '=', company.id),
-    ...         ('name', '=', 'Main Cash'),
-    ...         ])
+    >>> _ = create_chart(company)
+    >>> accounts = get_accounts(company)
+    >>> receivable = accounts['receivable']
+    >>> revenue = accounts['revenue']
+    >>> expense = accounts['expense']
+    >>> cash = accounts['cash']
     >>> cash.bank_reconcile = True
     >>> cash.reconcile = True
     >>> cash.save()
+    >>> Account = Model.get('account.account')
     >>> customer_bank_discounts = Account(
     ...     name='Customers Bank Discount',
     ...     type=receivable.type,
     ...     bank_reconcile=True,
     ...     reconcile=True,
-    ...     party_required=True,
     ...     deferral=True,
     ...     parent=receivable.parent,
     ...     kind='other')
     >>> customer_bank_discounts.save()
-    >>> create_chart.form.account_receivable = receivable
-    >>> create_chart.form.account_payable = payable
-    >>> create_chart.execute('create_properties')
 
 Create and get journals::
 
+    >>> Sequence = Model.get('ir.sequence')
     >>> sequence = Sequence(name='Bank', code='account.journal',
     ...     company=company)
     >>> sequence.save()
@@ -194,7 +128,7 @@ Create payment term::
 Create customer invoice::
 
     >>> Invoice = Model.get('account.invoice')
-    >>> customer_invoice = Invoice(type='out_invoice')
+    >>> customer_invoice = Invoice(type='out')
     >>> customer_invoice.party = customer
     >>> customer_invoice.payment_term = payment_term
     >>> invoice_line = customer_invoice.lines.new()
@@ -255,7 +189,7 @@ Create transaction lines on statement line and post it::
     >>> st_move_line = statement_line.lines.new()
     >>> st_move_line.payment = payment
     >>> st_move_line.amount
-    Decimal('100.0')
+    Decimal('100.00')
     >>> st_move_line.account.name
     u'Customers Bank Discount'
     >>> st_move_line.party.name
@@ -308,7 +242,7 @@ Create transaction lines on statement line and post it::
     >>> st_move_line = statement_line2.lines.new()
     >>> st_move_line.payment = payment
     >>> st_move_line.amount
-    Decimal('-100.0')
+    Decimal('-100.00')
     >>> st_move_line.account.name
     u'Customers Bank Discount'
     >>> st_move_line.party.name
@@ -355,7 +289,7 @@ Create transaction lines on statement line and post it::
     >>> st_move_line = statement_line3.lines.new()
     >>> st_move_line.invoice = customer_invoice
     >>> st_move_line.amount
-    Decimal('100.0')
+    Decimal('100.00')
     >>> st_move_line.account.name
     u'Main Receivable'
     >>> st_move_line.party.name
@@ -377,7 +311,7 @@ So the payment is succeeded, the invoice paid again and due amounts are 0::
 
 Create two customer invoices::
 
-    >>> customer_invoice2 = Invoice(type='out_invoice')
+    >>> customer_invoice2 = Invoice(type='out')
     >>> customer_invoice2.party = customer
     >>> customer_invoice2.payment_term = payment_term
     >>> invoice_line = customer_invoice2.lines.new()
@@ -390,7 +324,7 @@ Create two customer invoices::
     >>> customer_invoice2.state
     u'posted'
 
-    >>> customer_invoice3 = Invoice(type='out_invoice')
+    >>> customer_invoice3 = Invoice(type='out')
     >>> customer_invoice3.party = customer
     >>> customer_invoice3.payment_term = payment_term
     >>> invoice_line = customer_invoice3.lines.new()
@@ -467,7 +401,7 @@ Create transaction lines on statement lines and post them::
     >>> st_move_line = statement_line4.lines.new()
     >>> st_move_line.payment = payment2
     >>> st_move_line.amount
-    Decimal('160.0')
+    Decimal('160.00')
     >>> st_move_line.account.name
     u'Customers Bank Discount'
     >>> st_move_line.party.name
@@ -477,7 +411,7 @@ Create transaction lines on statement lines and post them::
     >>> st_move_line = statement_line5.lines.new()
     >>> st_move_line.payment = payment2
     >>> st_move_line.amount
-    Decimal('80.0')
+    Decimal('80.00')
     >>> st_move_line.account.name
     u'Customers Bank Discount'
     >>> st_move_line.party.name
@@ -520,7 +454,7 @@ invoice, selecting the invoice and the payment::
     >>> st_move_line.payment == payment2
     True
     >>> st_move_line.amount
-    Decimal('40.0')
+    Decimal('40.00')
     >>> st_move_line.account.name
     u'Main Receivable'
     >>> st_move_line.party.name
@@ -543,7 +477,7 @@ third invoice selecting the payment::
     >>> st_move_line = statement_line7.lines.new()
     >>> st_move_line.payment = payment3
     >>> st_move_line.amount
-    Decimal('-80.0')
+    Decimal('-80.00')
     >>> st_move_line.account.name
     u'Customers Bank Discount'
     >>> st_move_line.party.name
