@@ -107,11 +107,13 @@ class StatementMoveLine:
     @classmethod
     def __setup__(cls):
         super(StatementMoveLine, cls).__setup__()
-        for clause in cls.invoice.domain:
-            if (isinstance(clause, If)
-                    and clause._condition == Bool(Eval('account'))):
-                clause._condition = (Bool(Eval('account'))
-                    & ~Bool(Eval('payment')))
+        if 'payment' not in cls.invoice.depends:
+            for clause in cls.invoice.domain:
+                if (isinstance(clause, If)
+                        and clause._condition == Bool(Eval('account'))):
+                    clause._condition = (Bool(Eval('account'))
+                        & ~Bool(Eval('payment')))
+            cls.invoice.depends.append('payment')
 
     @staticmethod
     def default_amount():
