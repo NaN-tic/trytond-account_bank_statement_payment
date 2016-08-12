@@ -115,13 +115,6 @@ class StatementMoveLine:
                         & ~Bool(Eval('payment')))
             cls.invoice.depends.append('payment')
 
-    @staticmethod
-    def default_amount():
-        # This is a trick to avoid error described in
-        # https://bugs.tryton.org/issue5711 (it doesn't solve if the user clean
-        # the amount field)
-        return Decimal(0)
-
     @fields.depends('line')
     def on_change_with_line_state(self, name=None):
         pool = Pool()
