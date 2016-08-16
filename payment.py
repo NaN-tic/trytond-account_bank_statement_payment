@@ -19,8 +19,8 @@ class Journal:
             ['OR',
                 ('clearing_percent', '=', None),
                 [
-                    ('clearing_percent', '>', Decimal(0)),
-                    ('clearing_percent', '<=', Decimal(1.0)),
+                    ('clearing_percent', '>', 0),
+                    ('clearing_percent', '<=', 1),
                     ],
                 ],
             ],
