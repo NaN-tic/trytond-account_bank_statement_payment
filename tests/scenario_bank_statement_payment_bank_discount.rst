@@ -140,7 +140,7 @@ Create customer invoice payment::
     ...     if l.account == receivable]
     >>> pay_line = Wizard('account.move.line.pay', [line])
     >>> pay_line.form.journal = payment_receivable_100_journal
-    >>> pay_line.execute('pay')
+    >>> pay_line.execute('start')
     >>> payment, = Payment.find([('state', '=', 'draft')])
     >>> payment.amount
     Decimal('100.00')
@@ -339,7 +339,7 @@ Create a payment with 80% bank discount for first of them::
     ...     if l.account == receivable]
     >>> pay_line = Wizard('account.move.line.pay', [line])
     >>> pay_line.form.journal = payment_receivable_80_journal
-    >>> pay_line.execute('pay')
+    >>> pay_line.execute('start')
     >>> payment2, = Payment.find([('state', '=', 'draft')])
     >>> payment2.amount
     Decimal('200.00')
@@ -358,7 +358,7 @@ And another payment with 100% bank discount for the second one::
     ...     if l.account == receivable]
     >>> pay_line = Wizard('account.move.line.pay', [line])
     >>> pay_line.form.journal = payment_receivable_100_journal
-    >>> pay_line.execute('pay')
+    >>> pay_line.execute('start')
     >>> payment3, = Payment.find([('state', '=', 'draft')])
     >>> payment3.amount
     Decimal('80.00')
