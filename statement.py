@@ -261,7 +261,7 @@ class StatementMoveLine:
         return move
 
     def _check_invoice_amount_to_pay(self):
-        if self.payment and self.payment.journal.advance:
+        if self.payment:
             return
         super(StatementMoveLine, self)._check_invoice_amount_to_pay()
 
