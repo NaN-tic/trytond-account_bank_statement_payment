@@ -47,14 +47,14 @@ Create chart of accounts::
     >>> cash.reconcile = True
     >>> cash.save()
     >>> Account = Model.get('account.account')
-    >>> customer_bank_discounts = Account(
-    ...     name='Customers Bank Discount',
-    ...     type=receivable.type,
-    ...     bank_reconcile=True,
-    ...     reconcile=True,
-    ...     deferral=True,
-    ...     parent=receivable.parent,
-    ...     kind='other')
+    >>> customer_bank_discounts = Account()
+    >>> customer_bank_discounts.name = 'Customers Bank Discount'
+    >>> customer_bank_discounts.parent = receivable.parent
+    >>> customer_bank_discounts.type = receivable.type
+    >>> customer_bank_discounts.bank_reconcile = True
+    >>> customer_bank_discounts.reconcile = True
+    >>> customer_bank_discounts.deferral = True
+    >>> customer_bank_discounts.kind = 'other'
     >>> customer_bank_discounts.save()
 
 Create and get journals::
