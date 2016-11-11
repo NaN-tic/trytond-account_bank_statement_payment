@@ -27,6 +27,10 @@ Create company::
 
     >>> _ = create_company()
     >>> company = get_company()
+    >>> tax_identifier = company.party.identifiers.new()
+    >>> tax_identifier.type = 'eu_vat'
+    >>> tax_identifier.code = 'BE0897290877'
+    >>> company.party.save()
 
 Create fiscal year::
 
