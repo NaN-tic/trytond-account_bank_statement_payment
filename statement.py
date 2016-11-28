@@ -121,7 +121,7 @@ class StatementMoveLine:
         StatementLine = pool.get('account.bank.statement.line')
         return self.line.state if self.line else StatementLine.default_state()
 
-    @fields.depends('party', 'payment', methods=['account'])
+    @fields.depends('party', 'payment', 'account', methods=['account'])
     def on_change_party(self):
         original_account = self.account
         super(StatementMoveLine, self).on_change_party()
