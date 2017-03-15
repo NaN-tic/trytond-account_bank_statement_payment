@@ -118,5 +118,7 @@ class Payment:
         if move and self.journal.clearing_percent < Decimal(1):
             for line in move.lines:
                 line.debit *= self.journal.clearing_percent
+                line.debit = self.journal.currency.round(line.debit)
                 line.credit *= self.journal.clearing_percent
+                line.credit = self.journal.currency.round(line.credit)
         return move
