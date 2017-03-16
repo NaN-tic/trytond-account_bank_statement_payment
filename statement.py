@@ -157,7 +157,7 @@ class StatementMoveLine:
             if payments:
                 self.payment = payments[0]
 
-    @fields.depends('payment', 'party', 'account', 'amount',
+    @fields.depends('payment', 'party', 'account', 'amount','line',
         '_parent_line._parent_statement.journal',
         methods=['invoice'])
     def on_change_payment(self):
@@ -179,13 +179,12 @@ class StatementMoveLine:
                         self.account = clearing_account
                 else:
                     self.account = clearing_account
-            if (not self.amount and self.line.statement
-                    and self.line.statement.journal):
+            if (self.line and self.line.journal):
                 with Transaction().set_context(date=self.payment.date):
                     amount = Currency.compute(
                         self.payment.currency,
                         self.payment.amount,
-                        self.line.statement.journal.currency)
+                        self.line.journal.currency)
                 if clearing_account and self.account == clearing_account:
                     if (self.payment.journal.clearing_percent < Decimal(1)
                             and self.payment.clearing_move):
@@ -193,7 +192,7 @@ class StatementMoveLine:
                             - self.payment.journal.clearing_percent)
                     else:
                         amount *= self.payment.journal.clearing_percent
-                self.amount = amount
+                self.amount = self.line.journal.currency.round(amount)
                 if self.payment.kind == 'payable':
                     self.amount *= -1
 
