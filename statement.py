@@ -18,7 +18,6 @@ _ZERO = Decimal(0)
 class StatementLine:
     __metaclass__ = PoolMeta
     __name__ = 'account.bank.statement.line'
-    __metaclass__ = PoolMeta
 
     def _search_payments(self, amount):
         """
@@ -84,8 +83,8 @@ class StatementLine:
 
 
 class StatementMoveLine:
-    __name__ = 'account.bank.statement.move.line'
     __metaclass__ = PoolMeta
+    __name__ = 'account.bank.statement.move.line'
     line_state = fields.Function(fields.Selection([
                 ('draft', 'Draft'),
                 ('confirmed', 'Confirmed'),
@@ -159,6 +158,7 @@ class StatementMoveLine:
         pool = Pool()
         Currency = pool.get('currency.currency')
         Invoice = pool.get('account.invoice')
+
         if self.payment:
             if not self.party:
                 self.party = self.payment.party
@@ -282,8 +282,8 @@ class StatementMoveLine:
 
 
 class Group:
-    __name__ = 'account.payment.group'
     __metaclass__ = PoolMeta
+    __name__ = 'account.payment.group'
     total_amount = fields.Function(fields.Numeric('Total Amount'),
         'get_total_amount', searcher='search_total_amount')
 
