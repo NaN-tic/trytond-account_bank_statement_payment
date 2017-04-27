@@ -3,7 +3,6 @@
 import datetime
 from collections import defaultdict
 from decimal import Decimal
-from sql.aggregate import Sum
 
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
@@ -11,8 +10,7 @@ from trytond.wizard import Wizard, StateTransition, StateView, Button
 from trytond.pyson import Bool, Eval, If
 from trytond.transaction import Transaction
 
-__all__ = ['StatementLine', 'StatementMoveLine', 'Group',
-    'AddPaymentStart', 'AddPayment']
+__all__ = ['StatementLine', 'StatementMoveLine', 'AddPaymentStart', 'AddPayment']
 
 _ZERO = Decimal(0)
 
@@ -287,34 +285,6 @@ class StatementMoveLine:
             default = default.copy()
         default.setdefault('payment', None)
         return super(StatementMoveLine, cls).copy(lines, default=default)
-
-
-class Group:
-    __metaclass__ = PoolMeta
-    __name__ = 'account.payment.group'
-    total_amount = fields.Function(fields.Numeric('Total Amount'),
-        'get_total_amount', searcher='search_total_amount')
-
-    def get_total_amount(self, name=None):
-        amount = Decimal('0.0')
-        for payment in self.payments:
-            amount += payment.amount
-        return amount
-
-    @classmethod
-    def search_total_amount(cls, name, clause):
-        pool = Pool()
-        Payment = pool.get('account.payment')
-        _, operator, value = clause
-        Operator = fields.SQL_OPERATORS[operator]
-        payment = Payment.__table__()
-        value = Payment.amount._domain_value(operator, value)
-
-        query = payment.select(payment.group,
-                group_by=(payment.group),
-                having=Operator(Sum(payment.amount), value)
-                )
-        return [('id', 'in', query)]
 
 
 class AddPaymentStart(ModelView):
