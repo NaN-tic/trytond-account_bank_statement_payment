@@ -2,10 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:account.payment.group,total_amount:"
-msgid "Total Amount"
-msgstr "Total"
-
 msgctxt "field:account.bank.statement.move.line,line_state:"
 msgid "State"
 msgstr "Estado"
@@ -14,6 +10,14 @@ msgctxt "field:account.bank.statement.move.line,payment:"
 msgid "Payment"
 msgstr "Pago"
 
+msgctxt "field:account.bank.statement.payment.add.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:account.bank.statement.payment.add.start,payments:"
+msgid "Payments"
+msgstr "Pagos"
+
 msgctxt "field:account.move.line,payment_date:"
 msgid "Payment Date"
 msgstr "Fecha pago"
@@ -21,6 +25,10 @@ msgstr "Fecha pago"
 msgctxt "field:account.move.line,payment_group:"
 msgid "Payment Group"
 msgstr "Grupo de pagos"
+
+msgctxt "field:account.payment.group,total_amount:"
+msgid "Total Amount"
+msgstr "Total"
 
 msgctxt "field:account.payment.journal,advance:"
 msgid "Advance"
@@ -45,6 +53,14 @@ msgid ""
 msgstr ""
 "El porcentajo sobre el importe total del vencimiento que se moverá a la "
 "cuenta de liquidación cuando el pago sea exitoso."
+
+msgctxt "model:account.bank.statement.payment.add.start,name:"
+msgid "Add Payment Start"
+msgstr "Inicio añadir pagos"
+
+msgctxt "model:ir.action,name:wizard_account_bank_statement_payment_add"
+msgid "Add payments"
+msgstr "Añadir pagos"
 
 msgctxt "selection:account.bank.statement.move.line,line_state:"
 msgid "Canceled"
@@ -73,3 +89,11 @@ msgstr "%"
 msgctxt "view:account.payment.journal:"
 msgid "Clearing"
 msgstr "Liquidacion"
+
+msgctxt "wizard_button:account.bank.statement.payment.add,start,add:"
+msgid "Add"
+msgstr "Añadir"
+
+msgctxt "wizard_button:account.bank.statement.payment.add,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"

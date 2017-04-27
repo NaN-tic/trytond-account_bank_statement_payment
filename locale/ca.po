@@ -2,10 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:account.payment.group,total_amount:"
-msgid "Total Amount"
-msgstr "Total"
-
 msgctxt "field:account.bank.statement.move.line,line_state:"
 msgid "State"
 msgstr "Estat"
@@ -14,6 +10,14 @@ msgctxt "field:account.bank.statement.move.line,payment:"
 msgid "Payment"
 msgstr "Pagament"
 
+msgctxt "field:account.bank.statement.payment.add.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:account.bank.statement.payment.add.start,payments:"
+msgid "Payments"
+msgstr "Pagaments"
+
 msgctxt "field:account.move.line,payment_date:"
 msgid "Payment Date"
 msgstr "Data pagament"
@@ -21,6 +25,10 @@ msgstr "Data pagament"
 msgctxt "field:account.move.line,payment_group:"
 msgid "Payment Group"
 msgstr "Grup de pagaments"
+
+msgctxt "field:account.payment.group,total_amount:"
+msgid "Total Amount"
+msgstr "Total"
 
 msgctxt "field:account.payment.journal,advance:"
 msgid "Advance"
@@ -45,6 +53,14 @@ msgid ""
 msgstr ""
 "El percentatge sobre el total de l'import del venciment que es mourà al "
 "compte de liquidació quan el pagament sigui exitós."
+
+msgctxt "model:account.bank.statement.payment.add.start,name:"
+msgid "Add Payment Start"
+msgstr "Inici d'afegir pagaments"
+
+msgctxt "model:ir.action,name:wizard_account_bank_statement_payment_add"
+msgid "Add payments"
+msgstr "Afegir pagaments"
 
 msgctxt "selection:account.bank.statement.move.line,line_state:"
 msgid "Canceled"
@@ -73,3 +89,11 @@ msgstr "%"
 msgctxt "view:account.payment.journal:"
 msgid "Clearing"
 msgstr "Liquidació"
+
+msgctxt "wizard_button:account.bank.statement.payment.add,start,add:"
+msgid "Add"
+msgstr "Afegeix"
+
+msgctxt "wizard_button:account.bank.statement.payment.add,start,end:"
+msgid "Cancel"
+msgstr "Cancel·la"

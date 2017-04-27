@@ -46,12 +46,11 @@ class Journal:
 class Group:
     __name__ = 'account.payment.group'
     __metaclass__ = PoolMeta
-
     total_amount = fields.Function(fields.Numeric('Total Amount'),
         'get_total_amount', searcher='search_total_amount')
 
     def get_total_amount(self, name=None):
-        amount = Decimal(0)
+        amount = Decimal('0.0')
         for payment in self.payments:
             amount += payment.amount
         return amount
