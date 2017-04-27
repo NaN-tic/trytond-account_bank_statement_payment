@@ -96,7 +96,7 @@ msgstr "Liquidació"
 
 msgctxt "wizard_button:account.bank.statement.payment.add,start,add:"
 msgid "Add"
-msgstr "Afegir"
+msgstr "Afegeix"
 
 msgctxt "wizard_button:account.bank.statement.payment.add,start,end:"
 msgid "Cancel"
