@@ -6,3 +6,5 @@ include CHANGELOG
 include LICENSE
 include tryton.cfg
 include doc/*
+include locale/*.po
+
