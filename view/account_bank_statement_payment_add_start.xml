@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- This file is part account_bank_statement_payment module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<form>
+    <field name="payments" colspan="4"/>
+</form>

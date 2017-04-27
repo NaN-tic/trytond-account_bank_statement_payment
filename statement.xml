@@ -24,5 +24,29 @@
                 ref="account_bank_statement_account.account_bank_statement_move_line_tree_view"/>
             <field name="name">bank_statement_move_line_tree</field>
         </record>
+
+        <!-- account.bank.statement.add -->
+        <record model="ir.ui.view" id="account_bank_statement_payment_add_start">
+            <field name="model">account.bank.statement.payment.add.start</field>
+            <field name="type">form</field>
+            <field name="name">account_bank_statement_payment_add_start</field>
+        </record>
+
+        <!-- account.bank.statement.add - Wizard -->
+        <record model="ir.action.wizard" id="wizard_account_bank_statement_payment_add">
+            <field name="name">Add payments</field>
+            <field name="wiz_name">account.bank.statement.payment.add</field>
+            <field name="model">account.bank.statement.line</field>
+        </record>
+        <record model="ir.action.keyword" id="account_bank_statement_payment_add_keyword">
+            <field name="keyword">form_action</field>
+            <field name="model">account.bank.statement.line,-1</field>
+            <field name="action" ref="wizard_account_bank_statement_payment_add"/>
+        </record>
+        <record model="ir.action-res.group"
+            id="action_group_wizard_account_bank_statement_payment_add">
+            <field name="action" ref="wizard_account_bank_statement_payment_add"/>
+            <field name="group" ref="account.group_account"/>
+        </record>
     </data>
 </tryton>

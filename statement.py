@@ -3,14 +3,14 @@
 import datetime
 from collections import defaultdict
 from decimal import Decimal
-from sql.aggregate import Sum
 
-from trytond.model import fields
+from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
+from trytond.wizard import Wizard, StateTransition, StateView, Button
 from trytond.pyson import Bool, Eval, If
 from trytond.transaction import Transaction
 
-__all__ = ['StatementLine', 'StatementMoveLine', 'Group']
+__all__ = ['StatementLine', 'StatementMoveLine', 'AddPaymentStart', 'AddPayment']
 
 _ZERO = Decimal(0)
 
@@ -280,29 +280,56 @@ class StatementMoveLine:
         return super(StatementMoveLine, cls).copy(lines, default=default)
 
 
-class Group:
-    __metaclass__ = PoolMeta
-    __name__ = 'account.payment.group'
-    total_amount = fields.Function(fields.Numeric('Total Amount'),
-        'get_total_amount', searcher='search_total_amount')
+class AddPaymentStart(ModelView):
+    'Add Payment Start'
+    __name__ = 'account.bank.statement.payment.add.start'
+    payments = fields.Many2Many('account.payment', None, None, 'Payments')
 
-    def get_total_amount(self, name=None):
-        amount = Decimal('0.0')
-        for payment in self.payments:
-            amount += payment.amount
-        return amount
 
-    @classmethod
-    def search_total_amount(cls, name, clause):
+class AddPayment(Wizard):
+    'Add Payment'
+    __name__ = 'account.bank.statement.payment.add'
+    start = StateView('account.bank.statement.payment.add.start',
+        'account_bank_statement_payment.account_bank_statement_payment_add_start', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Add', 'add', 'tryton-ok', default=True),
+            ])
+    add = StateTransition()
+
+    def transition_add(self):
         pool = Pool()
-        Payment = pool.get('account.payment')
-        _, operator, value = clause
-        Operator = fields.SQL_OPERATORS[operator]
-        payment = Payment.__table__()
-        value = Payment.amount._domain_value(operator, value)
+        StatementLine = pool.get('account.bank.statement.line')
+        BSMoveLine = pool.get('account.bank.statement.move.line')
 
-        query = payment.select(payment.group,
-                group_by=(payment.group),
-                having=Operator(Sum(payment.amount), value)
-                )
-        return [('id', 'in', query)]
+        payments = self.start.payments
+
+        to_create = []
+        for line in StatementLine.browse(Transaction().context['active_ids']):
+            for payment in payments:
+                if payment.line and payment.line.account:
+                    account = payment.line.account
+                elif payment.kind == 'payable':
+                    if not payment.party.account_payable:
+                        continue
+                    account = payment.party.account_payable
+                elif payment.kind == 'receivable':
+                    if not payment.party.account_receivable:
+                        continue
+                    account = payment.party.account_receivable
+
+                bsmove_line = BSMoveLine()
+                bsmove_line.line = line
+                bsmove_line.payment = payment
+                bsmove_line.date = line.date
+                bsmove_line.amount = payment.amount
+                bsmove_line.party = payment.party
+                bsmove_line.account = account
+                bsmove_line.description = payment.description
+                # bsmove_line.move =
+                # bsmove_line.invoice =
+                to_create.append(bsmove_line._save_values)
+
+        if to_create:
+            BSMoveLine.create(to_create)
+
+        return 'end'
