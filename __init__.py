@@ -13,6 +13,7 @@ def register():
         payment.Group,
         payment.Payment,
         statement.AddPaymentStart,
+        statement.Group,
         statement.StatementLine,
         statement.StatementMoveLine,
         module='account_bank_statement_payment', type_='model')

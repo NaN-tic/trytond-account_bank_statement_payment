@@ -9,11 +9,11 @@ from trytond.tools import grouped_slice, reduce_ids
 from trytond.transaction import Transaction
 
 __all__ = ['MoveLine']
-__metaclass__ = PoolMeta
 
 
 class MoveLine:
     __name__ = 'account.move.line'
+    __metaclass__ = PoolMeta
     payment_group = fields.Function(fields.Many2One('account.payment.group',
             'Payment Group'),
         'get_payment_fields', searcher='search_payment_fields')
@@ -25,7 +25,7 @@ class MoveLine:
         pool = Pool()
         Payment = pool.get('account.payment')
         table = Payment.__table__()
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
 
         line_ids = [l.id for l in lines]
         result = {}.fromkeys(line_ids, None)

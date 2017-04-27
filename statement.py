@@ -3,6 +3,7 @@
 import datetime
 from collections import defaultdict
 from decimal import Decimal
+from sql.aggregate import Sum
 
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
@@ -10,14 +11,15 @@ from trytond.wizard import Wizard, StateTransition, StateView, Button
 from trytond.pyson import Bool, Eval, If
 from trytond.transaction import Transaction
 
-__all__ = ['StatementLine', 'StatementMoveLine', 'AddPaymentStart', 'AddPayment']
+__all__ = ['StatementLine', 'StatementMoveLine', 'Group',
+    'AddPaymentStart', 'AddPayment']
 
 _ZERO = Decimal(0)
 
 
 class StatementLine:
-    __name__ = 'account.bank.statement.line'
     __metaclass__ = PoolMeta
+    __name__ = 'account.bank.statement.line'
 
     def _search_payments(self, amount):
         """
@@ -83,8 +85,8 @@ class StatementLine:
 
 
 class StatementMoveLine:
-    __name__ = 'account.bank.statement.move.line'
     __metaclass__ = PoolMeta
+    __name__ = 'account.bank.statement.move.line'
     line_state = fields.Function(fields.Selection([
                 ('draft', 'Draft'),
                 ('confirmed', 'Confirmed'),
@@ -106,11 +108,20 @@ class StatementMoveLine:
     @classmethod
     def __setup__(cls):
         super(StatementMoveLine, cls).__setup__()
-        for clause in cls.invoice.domain:
-            if (isinstance(clause, If)
-                    and clause._condition == Bool(Eval('account'))):
-                clause._condition = (Bool(Eval('account'))
-                    & ~Bool(Eval('payment')))
+        if 'payment' not in cls.invoice.depends:
+            for clause in cls.invoice.domain:
+                if (isinstance(clause, If)
+                        and clause._condition == Bool(Eval('account'))):
+                    clause._condition = (Bool(Eval('account'))
+                        & ~Bool(Eval('payment')))
+            cls.invoice.depends.append('payment')
+
+    @staticmethod
+    def default_amount():
+        # This is a trick to avoid error described in
+        # https://bugs.tryton.org/issue5711 (it doesn't solve if the user clean
+        # the amount field)
+        return Decimal(0)
 
     @fields.depends('line')
     def on_change_with_line_state(self, name=None):
@@ -120,53 +131,45 @@ class StatementMoveLine:
 
     @fields.depends('party', 'payment', methods=['account'])
     def on_change_party(self):
-        changes = super(StatementMoveLine, self).on_change_party()
+        original_account = self.account
+        super(StatementMoveLine, self).on_change_party()
         if self.payment:
             if self.payment.party != self.party:
-                changes['payment'] = None
                 self.payment = None
-            elif changes.get('account'):
-                changes.update(self.on_change_account())
-        return changes
+            elif self.account != original_account:
+                self.on_change_account()
 
     @fields.depends('account', 'payment')
     def on_change_account(self):
-        changes = super(StatementMoveLine, self).on_change_account()
+        super(StatementMoveLine, self).on_change_account()
         if self.payment:
             clearing_account = self.payment.journal.clearing_account
             if self.account != clearing_account:
-                changes['payment'] = None
                 self.payment = None
-        return changes
 
     @fields.depends('payment')
     def on_change_invoice(self):
         pool = Pool()
         Payment = pool.get('account.payment')
-        changes = super(StatementMoveLine, self).on_change_invoice()
+        super(StatementMoveLine, self).on_change_invoice()
         if self.invoice and not self.payment:
             payments = Payment.search([
                     ('state', '=', 'processing'),
                     ('line.origin', '=', str(self.invoice)),
                     ])
             if payments:
-                changes['payment'] = payments[0].id
-                changes['payment.rec_name'] = payments[0].rec_name
                 self.payment = payments[0]
-        return changes
 
-    @fields.depends('payment', 'party', 'account', 'amount', 'line',
+    @fields.depends('payment', 'party', 'account', 'amount','line',
         '_parent_line._parent_statement.journal',
         methods=['invoice'])
     def on_change_payment(self):
         pool = Pool()
         Currency = pool.get('currency.currency')
         Invoice = pool.get('account.invoice')
-        changes = {}
+
         if self.payment:
             if not self.party:
-                changes['party'] = self.payment.party.id
-                changes['party.rec_name'] = self.payment.party.rec_name
                 self.party = self.payment.party
             clearing_account = self.payment.journal.clearing_account
             if not self.account and clearing_account:
@@ -174,16 +177,11 @@ class StatementMoveLine:
                 if self.payment.journal.clearing_percent < Decimal(1):
                     if self.payment.clearing_move:
                         if isinstance(self.payment.line.origin, Invoice):
-                            changes['invoice'] = self.payment.line.origin.id
                             self.invoice = self.payment.line.origin
-                            changes.update(self.on_change_invoice())
+                            self.on_change_invoice()
                     else:
-                        changes['account'] = clearing_account.id
-                        changes['account.rec_name'] = clearing_account.rec_name
                         self.account = clearing_account
                 else:
-                    changes['account'] = clearing_account.id
-                    changes['account.rec_name'] = clearing_account.rec_name
                     self.account = clearing_account
             if (self.line and self.line.journal):
                 with Transaction().set_context(date=self.payment.date):
@@ -198,12 +196,9 @@ class StatementMoveLine:
                             - self.payment.journal.clearing_percent)
                     else:
                         amount *= self.payment.journal.clearing_percent
-                changes['amount'] = self.line.journal.currency.round(amount)
-                self.amount = amount
+                self.amount = self.line.journal.currency.round(amount)
                 if self.payment.kind == 'payable':
-                    changes['amount'] *= -1
                     self.amount *= -1
-        return changes
 
     def create_move(self):
         pool = Pool()
@@ -292,6 +287,34 @@ class StatementMoveLine:
             default = default.copy()
         default.setdefault('payment', None)
         return super(StatementMoveLine, cls).copy(lines, default=default)
+
+
+class Group:
+    __metaclass__ = PoolMeta
+    __name__ = 'account.payment.group'
+    total_amount = fields.Function(fields.Numeric('Total Amount'),
+        'get_total_amount', searcher='search_total_amount')
+
+    def get_total_amount(self, name=None):
+        amount = Decimal('0.0')
+        for payment in self.payments:
+            amount += payment.amount
+        return amount
+
+    @classmethod
+    def search_total_amount(cls, name, clause):
+        pool = Pool()
+        Payment = pool.get('account.payment')
+        _, operator, value = clause
+        Operator = fields.SQL_OPERATORS[operator]
+        payment = Payment.__table__()
+        value = Payment.amount._domain_value(operator, value)
+
+        query = payment.select(payment.group,
+                group_by=(payment.group),
+                having=Operator(Sum(payment.amount), value)
+                )
+        return [('id', 'in', query)]
 
 
 class AddPaymentStart(ModelView):
