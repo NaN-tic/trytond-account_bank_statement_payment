@@ -306,7 +306,10 @@ class AddPayment(Wizard):
         to_create = []
         for line in StatementLine.browse(Transaction().context['active_ids']):
             for payment in payments:
-                if payment.line and payment.line.account:
+                # TODO move get account to new method
+                if payment.journal.clearing_account:
+                    account = payment.journal.clearing_account
+                elif payment.line and payment.line.account:
                     account = payment.line.account
                 elif payment.kind == 'payable':
                     if not payment.party.account_payable:
@@ -320,7 +323,7 @@ class AddPayment(Wizard):
                 bsmove_line = BSMoveLine()
                 bsmove_line.line = line
                 bsmove_line.payment = payment
-                bsmove_line.date = line.date
+                bsmove_line.date = line.date.date()
                 bsmove_line.amount = payment.amount
                 bsmove_line.party = payment.party
                 bsmove_line.account = account
