@@ -82,6 +82,14 @@ msgctxt "view:account.move.line:"
 msgid "Account Move Lines"
 msgstr "Apuntes contables"
 
+msgctxt "view:account.move.line:"
+msgid "Total credit"
+msgstr "Total haber"
+
+msgctxt "view:account.move.line:"
+msgid "Total debit"
+msgstr "Total debe"
+
 msgctxt "view:account.payment.journal:"
 msgid "%"
 msgstr "%"
