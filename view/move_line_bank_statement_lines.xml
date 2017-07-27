@@ -9,8 +9,8 @@
     <field name="maturity_date"/>
     <field name="payment_group"/>
     <field name="payment_date"/>
-    <field name="debit"/>
-    <field name="credit"/>
+    <field name="debit" sum="Total debit"/>
+    <field name="credit" sum="Total credit"/>
     <field name="origin"/>
     <field name="description"/>
     <field name="move_description"/>
