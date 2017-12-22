@@ -174,7 +174,7 @@ class StatementMoveLine:
                         self.account = clearing_account
                 else:
                     self.account = clearing_account
-            if (self.line and self.line.journal):
+            if (not self.amount and self.line and self.line.journal):
                 with Transaction().set_context(date=self.payment.date):
                     amount = Currency.compute(
                         self.payment.currency,

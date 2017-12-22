@@ -73,12 +73,20 @@ class AccountBankStatementPaymentTestCase(ModuleTestCase):
             #Create some parties
             customer1, customer2, supplier1, supplier2 = Party.create([{
                             'name': 'customer1',
+                            'account_receivable': receivable,
+                            'account_payable': payable,
                         }, {
                             'name': 'customer2',
+                            'account_receivable': receivable,
+                            'account_payable': payable,
                         }, {
                             'name': 'supplier1',
+                            'account_receivable': receivable,
+                            'account_payable': payable,
                         }, {
                             'name': 'supplier2',
+                            'account_receivable': receivable,
+                            'account_payable': payable,
                         }])
             # Create some moves
             vlist = [
