@@ -2,6 +2,10 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "error:account.bank.statement.move.line:"
+msgid "The payment \"%s\" doesn't have account move."
+msgstr "El pagament \"%s\" no té apunt comptable."
+
 msgctxt "field:account.bank.statement.move.line,line_state:"
 msgid "State"
 msgstr "Estat"
@@ -76,7 +80,7 @@ msgstr "Esborrany"
 
 msgctxt "selection:account.bank.statement.move.line,line_state:"
 msgid "Posted"
-msgstr "Confirmat"
+msgstr "Comptabilitzat"
 
 msgctxt "view:account.bank.statement.payment.add.start:"
 msgid "Add Payments"

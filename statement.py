@@ -113,6 +113,10 @@ class StatementMoveLine:
                     clause._condition = (Bool(Eval('account'))
                         & ~Bool(Eval('payment')))
             cls.invoice.depends.append('payment')
+        cls._error_messages.update({
+                'payment_without_account_move': ('The payment "%s" doesn\'t '
+                    'have account move.'),
+                })
 
     @staticmethod
     def default_amount():
@@ -242,6 +246,9 @@ class StatementMoveLine:
                 Move.post([self.payment.clearing_move])
 
             to_reconcile = defaultdict(list)
+            if not self.payment.line:
+                self.raise_user_error('payment_without_account_move',
+                    self.payment.rec_name)
             lines = move.lines + (self.payment.line,)
             if self.payment.clearing_move:
                 lines += self.payment.clearing_move.lines
