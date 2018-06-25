@@ -156,7 +156,7 @@ class StatementMoveLine:
                 self.payment = payments[0]
 
     @fields.depends('payment', 'party', 'account', 'amount','line',
-        '_parent_line._parent_statement.journal',
+        '_parent_line._parent_statement.journal', '_parent_line.statement',
         methods=['invoice'])
     def on_change_payment(self):
         pool = Pool()
