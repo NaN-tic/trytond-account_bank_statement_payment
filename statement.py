@@ -15,8 +15,7 @@ __all__ = ['StatementLine', 'StatementMoveLine', 'AddPaymentStart', 'AddPayment'
 _ZERO = Decimal(0)
 
 
-class StatementLine:
-    __metaclass__ = PoolMeta
+class StatementLine(metaclass=PoolMeta):
     __name__ = 'account.bank.statement.line'
 
     def _search_payments(self, amount):
@@ -82,8 +81,7 @@ class StatementLine:
         self._search_payments_reconciliation()
 
 
-class StatementMoveLine:
-    __metaclass__ = PoolMeta
+class StatementMoveLine(metaclass=PoolMeta):
     __name__ = 'account.bank.statement.move.line'
     line_state = fields.Function(fields.Selection([
                 ('draft', 'Draft'),
@@ -262,7 +260,7 @@ class StatementMoveLine:
                         line.account.id,
                         line.party.id if line.party else None)
                     to_reconcile[key].append(line)
-            for lines in to_reconcile.itervalues():
+            for lines in list(to_reconcile.values()):
                 if not sum((l.debit - l.credit) for l in lines):
                     MoveLine.reconcile(lines)
         return move

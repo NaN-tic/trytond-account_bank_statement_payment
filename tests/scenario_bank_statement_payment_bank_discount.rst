@@ -135,7 +135,7 @@ Create customer invoice::
     >>> customer_invoice.save()
     >>> customer_invoice.click('post')
     >>> customer_invoice.state
-    u'posted'
+    'posted'
 
 Create customer invoice payment::
 
@@ -150,18 +150,18 @@ Create customer invoice payment::
     Decimal('100.00')
     >>> payment.click('approve')
     >>> payment.state
-    u'approved'
+    'approved'
     >>> process_payment = Wizard('account.payment.process', [payment])
     >>> process_payment.execute('process')
     >>> payment.reload()
     >>> payment.state
-    u'processing'
+    'processing'
 
 Check invoice is still pending to pay so the amount is in customer's debit account::
 
     >>> customer_invoice.reload()
     >>> customer_invoice.state
-    u'posted'
+    'posted'
     >>> receivable.reload()
     >>> receivable.balance
     Decimal('100.00')
@@ -177,7 +177,7 @@ Create and confirm bank statement::
     >>> statement.save()
     >>> statement.click('confirm')
     >>> statement.state
-    u'confirmed'
+    'confirmed'
 
 Create transaction lines on statement line and post it::
 
@@ -187,9 +187,9 @@ Create transaction lines on statement line and post it::
     >>> st_move_line.amount
     Decimal('100.00')
     >>> st_move_line.account.name
-    u'Customers Bank Discount'
+    'Customers Bank Discount'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line.save()
     >>> statement_line.click('post')
 
@@ -211,7 +211,7 @@ bank::
 
     >>> customer_invoice.reload()
     >>> customer_invoice.state
-    u'paid'
+    'paid'
     >>> receivable.reload()
     >>> receivable.balance
     Decimal('0.00')
@@ -230,7 +230,7 @@ statement::
     >>> statement2.save()
     >>> statement2.click('confirm')
     >>> statement2.state
-    u'confirmed'
+    'confirmed'
 
 Create transaction lines on statement line and post it::
 
@@ -240,9 +240,9 @@ Create transaction lines on statement line and post it::
     >>> st_move_line.amount
     Decimal('-100.00')
     >>> st_move_line.account.name
-    u'Customers Bank Discount'
+    'Customers Bank Discount'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line2.save()
     >>> statement_line2.click('post')
 
@@ -251,12 +251,12 @@ we doesn't have cash::
 
     >>> payment.reload()
     >>> payment.state
-    u'failed'
+    'failed'
     >>> payment.clearing_move == None
     True
     >>> customer_invoice.reload()
     >>> customer_invoice.state
-    u'posted'
+    'posted'
     >>> receivable.reload()
     >>> receivable.balance
     Decimal('100.00')
@@ -277,7 +277,7 @@ But finally, the customer pays the invoice directly::
     >>> statement3.save()
     >>> statement3.click('confirm')
     >>> statement3.state
-    u'confirmed'
+    'confirmed'
 
 Create transaction lines on statement line and post it::
 
@@ -287,9 +287,9 @@ Create transaction lines on statement line and post it::
     >>> st_move_line.amount
     Decimal('100.00')
     >>> st_move_line.account.name
-    u'Main Receivable'
+    'Main Receivable'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line3.save()
     >>> statement_line3.click('post')
 
@@ -297,7 +297,7 @@ So the payment is succeeded, the invoice paid again and due amounts are 0::
 
     >>> customer_invoice.reload()
     >>> customer_invoice.state
-    u'paid'
+    'paid'
     >>> receivable.reload()
     >>> receivable.balance
     Decimal('0.00')
@@ -318,7 +318,7 @@ Create two customer invoices::
     >>> customer_invoice2.save()
     >>> customer_invoice2.click('post')
     >>> customer_invoice2.state
-    u'posted'
+    'posted'
 
     >>> customer_invoice3 = Invoice(type='out')
     >>> customer_invoice3.party = customer
@@ -331,7 +331,7 @@ Create two customer invoices::
     >>> customer_invoice3.save()
     >>> customer_invoice3.click('post')
     >>> customer_invoice3.state
-    u'posted'
+    'posted'
 
     >>> receivable.reload()
     >>> receivable.balance
@@ -349,12 +349,12 @@ Create a payment with 80% bank discount for first of them::
     Decimal('200.00')
     >>> payment2.click('approve')
     >>> payment2.state
-    u'approved'
+    'approved'
     >>> process_payment = Wizard('account.payment.process', [payment2])
     >>> process_payment.execute('process')
     >>> payment2.reload()
     >>> payment2.state
-    u'processing'
+    'processing'
 
 And another payment with 100% bank discount for the second one::
 
@@ -368,12 +368,12 @@ And another payment with 100% bank discount for the second one::
     Decimal('80.00')
     >>> payment3.click('approve')
     >>> payment3.state
-    u'approved'
+    'approved'
     >>> process_payment = Wizard('account.payment.process', [payment3])
     >>> process_payment.execute('process')
     >>> payment3.reload()
     >>> payment3.state
-    u'processing'
+    'processing'
 
 Create and confirm bank statement::
 
@@ -389,7 +389,7 @@ Create and confirm bank statement::
     >>> statement4.save()
     >>> statement4.click('confirm')
     >>> statement4.state
-    u'confirmed'
+    'confirmed'
 
 Create transaction lines on statement lines and post them::
 
@@ -399,9 +399,9 @@ Create transaction lines on statement lines and post them::
     >>> st_move_line.amount
     Decimal('160.00')
     >>> st_move_line.account.name
-    u'Customers Bank Discount'
+    'Customers Bank Discount'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line4.save()
     >>> statement_line4.click('post')
     >>> st_move_line = statement_line5.lines.new()
@@ -409,9 +409,9 @@ Create transaction lines on statement lines and post them::
     >>> st_move_line.amount
     Decimal('80.00')
     >>> st_move_line.account.name
-    u'Customers Bank Discount'
+    'Customers Bank Discount'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line5.save()
     >>> statement_line5.click('post')
 
@@ -439,7 +439,7 @@ paid by customer but bank substract the third invoice amount::
     >>> statement5.save()
     >>> statement5.click('confirm')
     >>> statement5.state
-    u'confirmed'
+    'confirmed'
 
 Create transaction line on statement line with pending amount of second
 invoice, selecting the invoice and the payment::
@@ -452,9 +452,9 @@ invoice, selecting the invoice and the payment::
     >>> st_move_line.amount
     Decimal('40.00')
     >>> st_move_line.account.name
-    u'Main Receivable'
+    'Main Receivable'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line6.save()
     >>> statement_line6.click('post')
 
@@ -462,10 +462,10 @@ The payment of second customer invoice is succeeded::
 
     >>> payment2.reload()
     >>> payment2.state
-    u'succeeded'
+    'succeeded'
     >>> customer_invoice2.reload()
     >>> customer_invoice2.state
-    u'paid'
+    'paid'
 
 Create transaction line on statement line with recovering of bank discount for
 third invoice selecting the payment::
@@ -475,9 +475,9 @@ third invoice selecting the payment::
     >>> st_move_line.amount
     Decimal('-80.00')
     >>> st_move_line.account.name
-    u'Customers Bank Discount'
+    'Customers Bank Discount'
     >>> st_move_line.party.name
-    u'Customer'
+    'Customer'
     >>> statement_line7.save()
     >>> statement_line7.click('post')
 
@@ -485,10 +485,10 @@ And the payment of third customer invoice is failed::
 
     >>> payment3.reload()
     >>> payment3.state
-    u'failed'
+    'failed'
     >>> customer_invoice3.reload()
     >>> customer_invoice3.state
-    u'posted'
+    'posted'
 
 The third invoice amount is also owed, the due with bank is empty and the cash
 do not have the third invoice amount::

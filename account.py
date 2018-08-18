@@ -11,9 +11,8 @@ from trytond.transaction import Transaction
 __all__ = ['MoveLine']
 
 
-class MoveLine:
+class MoveLine(metaclass=PoolMeta):
     __name__ = 'account.move.line'
-    __metaclass__ = PoolMeta
     payment_group = fields.Function(fields.Many2One('account.payment.group',
             'Payment Group'),
         'get_payment_fields', searcher='search_payment_fields')

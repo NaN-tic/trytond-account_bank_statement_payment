@@ -11,9 +11,8 @@ from trytond.pyson import Eval, Bool
 __all__ = ['Journal', 'Group', 'Payment']
 
 
-class Journal:
+class Journal(metaclass=PoolMeta):
     __name__ = 'account.payment.journal'
-    __metaclass__ = PoolMeta
     clearing_percent = fields.Numeric('Bank Discount Percent',
         digits=(16, 4), domain=[
             ['OR',
@@ -43,9 +42,8 @@ class Journal:
         return self.clearing_percent
 
 
-class Group:
+class Group(metaclass=PoolMeta):
     __name__ = 'account.payment.group'
-    __metaclass__ = PoolMeta
     total_amount = fields.Function(fields.Numeric('Total Amount'),
         'get_total_amount', searcher='search_total_amount')
 
@@ -71,9 +69,8 @@ class Group:
         return [('id', 'in', query)]
 
 
-class Payment:
+class Payment(metaclass=PoolMeta):
     __name__ = 'account.payment'
-    __metaclass__ = PoolMeta
 
     @classmethod
     @ModelView.button
@@ -105,7 +102,7 @@ class Payment:
                                 line.account.id,
                                 line.party.id if line.party else None)
                             to_reconcile[key].append(line)
-                    for lines in to_reconcile.itervalues():
+                    for lines in to_reconcile.values():
                         if not sum((l.debit - l.credit) for l in lines):
                             Line.reconcile(lines)
 
