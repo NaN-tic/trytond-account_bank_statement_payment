@@ -124,7 +124,8 @@ class StatementMoveLine:
         StatementLine = pool.get('account.bank.statement.line')
         return self.line.state if self.line else StatementLine.default_state()
 
-    @fields.depends('party', 'payment', 'account', methods=['account'])
+    @fields.depends('party', 'payment', 'account',
+        methods=['on_change_account'])
     def on_change_party(self):
         original_account = self.account
         super(StatementMoveLine, self).on_change_party()
@@ -157,7 +158,7 @@ class StatementMoveLine:
 
     @fields.depends('payment', 'party', 'account', 'amount','line',
         '_parent_line._parent_statement.journal', '_parent_line.statement',
-        methods=['invoice'])
+        methods=['on_change_invoice'])
     def on_change_payment(self):
         pool = Pool()
         Currency = pool.get('currency.currency')
