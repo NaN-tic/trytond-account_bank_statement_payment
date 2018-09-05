@@ -71,8 +71,6 @@ Create and get journals::
     >>> bank_journal = AccountJournal(
     ...     name='Bank Statement',
     ...     type='cash',
-    ...     credit_account=cash,
-    ...     debit_account=cash,
     ...     sequence=sequence)
     >>> bank_journal.save()
     >>> revenue_journal, = AccountJournal.find([('code', '=', 'REV')])
@@ -100,8 +98,7 @@ Create statement journal::
 
     >>> StatementJournal = Model.get('account.bank.statement.journal')
     >>> statement_journal = StatementJournal(
-    ...     name='Test',
-    ...     journal=bank_journal)
+    ...     name='Test', journal=bank_journal, account=cash)
     >>> statement_journal.save()
 
 Create party::

@@ -144,13 +144,12 @@ class AccountBankStatementPaymentTestCase(ModuleTestCase):
 
             cash_journal, = Journal.copy([journal_revenue], {
                         'type': 'cash',
-                        'credit_account': cash.id,
-                        'debit_account': cash.id,
                     })
 
             statement_journal, = StatementJournal.create([{
                         'name': 'Bank',
                         'journal': cash_journal.id,
+                        'account': cash.id,
                         }])
             statement, = Statement.create([{
                         'journal': statement_journal.id,
