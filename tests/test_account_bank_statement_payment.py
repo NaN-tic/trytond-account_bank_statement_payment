@@ -53,19 +53,18 @@ class AccountBankStatementPaymentTestCase(ModuleTestCase):
                     ('code', '=', 'REV'),
                     ])
             revenue, = Account.search([
-                    ('kind', '=', 'revenue'),
+                    ('type.revenue', '=',True),
                     ])
             receivable, = Account.search([
-                    ('kind', '=', 'receivable'),
+                    ('type.receivable', '=', True),
                     ])
             expense, = Account.search([
-                    ('kind', '=', 'expense'),
+                    ('type.expense', '=', True),
                     ])
             payable, = Account.search([
-                    ('kind', '=', 'payable'),
+                    ('type.payable', '=', True),
                     ])
             cash, = Account.search([
-                    ('kind', '=', 'other'),
                     ('name', '=', 'Main Cash'),
                     ])
             cash.bank_reconcile = True

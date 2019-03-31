@@ -58,7 +58,6 @@ Create chart of accounts::
     >>> customer_bank_discounts.bank_reconcile = True
     >>> customer_bank_discounts.reconcile = True
     >>> customer_bank_discounts.deferral = True
-    >>> customer_bank_discounts.kind = 'other'
     >>> customer_bank_discounts.save()
 
 Create and get journals::
@@ -135,14 +134,16 @@ Create customer invoice::
     'posted'
 
 Create customer invoice payment::
-
+    >>> tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     >>> Payment = Model.get('account.payment')
     >>> line, = [l for l in customer_invoice.move.lines
     ...     if l.account == receivable]
     >>> pay_line = Wizard('account.move.line.pay', [line])
+    >>> pay_line.form.date = tomorrow
+    >>> pay_line.execute('next_')
     >>> pay_line.form.journal = payment_receivable_100_journal
-    >>> pay_line.execute('start')
-    >>> payment, = Payment.find([('state', '=', 'draft')])
+    >>> pay_line.execute('next_')
+    >>> payment, = Payment.find([])
     >>> payment.amount
     Decimal('100.00')
     >>> payment.click('approve')
@@ -339,8 +340,9 @@ Create a payment with 80% bank discount for first of them::
     >>> line, = [l for l in customer_invoice2.move.lines
     ...     if l.account == receivable]
     >>> pay_line = Wizard('account.move.line.pay', [line])
+    >>> pay_line.execute('next_')
     >>> pay_line.form.journal = payment_receivable_80_journal
-    >>> pay_line.execute('start')
+    >>> pay_line.execute('next_')
     >>> payment2, = Payment.find([('state', '=', 'draft')])
     >>> payment2.amount
     Decimal('200.00')
@@ -358,8 +360,9 @@ And another payment with 100% bank discount for the second one::
     >>> line, = [l for l in customer_invoice3.move.lines
     ...     if l.account == receivable]
     >>> pay_line = Wizard('account.move.line.pay', [line])
+    >>> pay_line.execute('next_')
     >>> pay_line.form.journal = payment_receivable_100_journal
-    >>> pay_line.execute('start')
+    >>> pay_line.execute('next_')
     >>> payment3, = Payment.find([('state', '=', 'draft')])
     >>> payment3.amount
     Decimal('80.00')
@@ -444,8 +447,7 @@ invoice, selecting the invoice and the payment::
     >>> statement_line6, statement_line7 = statement5.lines
     >>> st_move_line = statement_line6.lines.new()
     >>> st_move_line.invoice = customer_invoice2
-    >>> st_move_line.payment == payment2
-    True
+    >>> import pdb; pdb.set_trace()
     >>> st_move_line.amount
     Decimal('40.00')
     >>> st_move_line.account.name
