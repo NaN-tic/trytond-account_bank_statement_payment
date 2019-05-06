@@ -447,7 +447,6 @@ invoice, selecting the invoice and the payment::
     >>> statement_line6, statement_line7 = statement5.lines
     >>> st_move_line = statement_line6.lines.new()
     >>> st_move_line.invoice = customer_invoice2
-    >>> import pdb; pdb.set_trace()
     >>> st_move_line.amount
     Decimal('40.00')
     >>> st_move_line.account.name
