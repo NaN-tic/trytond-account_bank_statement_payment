@@ -12,6 +12,7 @@
     <field name="debit" sum="Total debit"/>
     <field name="credit" sum="Total credit"/>
     <field name="origin"/>
+    <field name="move_origin"/>
     <field name="description"/>
     <field name="move_description"/>
 </tree>
