@@ -328,12 +328,11 @@ class AddPayment(Wizard):
                 bsmove_line.line = line
                 bsmove_line.payment = payment
                 bsmove_line.invoice = None
-                changes = bsmove_line.on_change_payment()
+                bsmove_line.on_change_payment()
                 bsmove_line.date = line.date.date()
-                bsmove_line.amount = changes.get('amount') or payment.amount
-                bsmove_line.party = changes.get('party') or payment.party
-                bsmove_line.account = changes.get('account') or account
-                bsmove_line.invoice = changes.get('invoice')
+                bsmove_line.amount = bsmove_line.amount or payment.amount
+                bsmove_line.party = bsmove_line.party or payment.party
+                bsmove_line.account = bsmove_line.account or account
                 bsmove_line.description = payment.description
                 # bsmove_line.move =
                 to_create.append(bsmove_line._save_values)
