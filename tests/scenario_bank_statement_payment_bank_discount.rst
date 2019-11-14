@@ -114,7 +114,6 @@ Create payment term::
     >>> payment_term = PaymentTerm(name='Direct')
     >>> payment_term_line = payment_term.lines.new()
     >>> payment_term_line.type = 'remainder'
-    >>> payment_term_line.days = 0
     >>> payment_term.save()
 
 Create customer invoice::
