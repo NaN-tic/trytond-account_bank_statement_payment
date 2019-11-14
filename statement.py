@@ -113,7 +113,7 @@ class StatementMoveLine(metaclass=PoolMeta):
                         & ~Bool(Eval('payment')))
             cls.invoice.depends.append('payment')
 
-    @fields.depends('line')
+    @fields.depends('line', '_parent_line.state')
     def on_change_with_line_state(self, name=None):
         pool = Pool()
         StatementLine = pool.get('account.bank.statement.line')
