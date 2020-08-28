@@ -87,14 +87,14 @@ class StatementMoveLine(metaclass=PoolMeta):
     line_state = fields.Function(fields.Selection([
                 ('draft', 'Draft'),
                 ('confirmed', 'Confirmed'),
-                ('canceled', 'Canceled'),
+                ('cancelled', "Cancelled"),
                 ('posted', 'Posted'),
                 ], 'State'),
         'on_change_with_line_state')
     payment = fields.Many2One('account.payment', 'Payment',
         domain=[
             If(Bool(Eval('party')), [('party', '=', Eval('party'))], []),
-            If(Eval('line_state').in_(['canceled', 'posted']),
+            If(Eval('line_state').in_(['cancelled', 'posted']),
                 ('state', 'in', ['processing', 'succeeded', 'failed']),
                 If(Eval('amount', 0.0) < 0.0,
                     ('state', 'in', ['processing', 'succeeded']),
