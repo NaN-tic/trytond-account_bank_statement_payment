@@ -146,7 +146,7 @@ class StatementMoveLine(metaclass=PoolMeta):
         if self.invoice and not self.payment:
             payments = Payment.search([
                     ('state', '=', 'processing'),
-                    ('line.origin', '=', str(self.invoice)),
+                    ('line.move.origin', '=', str(self.invoice)),
                     ])
             if payments:
                 self.payment = payments[0]
