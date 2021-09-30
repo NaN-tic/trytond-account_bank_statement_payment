@@ -13,7 +13,7 @@ MODULE2PREFIX = {
     'account_bank_statement': 'trytonspain',
     'account_bank_statement_counterpart': 'trytonspain',
     'account_bank_statement_account': 'trytonspain',
-    'account_move_draft': 'trytonspain'}
+    }
 OWNER = {
     'nantic':'NaN-tic',
     'trytonzz':'nanticzz',
