@@ -11,7 +11,9 @@ from trytond.pyson import Bool, Eval, If
 from trytond.transaction import Transaction
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
-__all__ = ['StatementLine', 'StatementMoveLine', 'AddPaymentStart', 'AddPayment']
+
+__all__ = ['StatementLine', 'StatementMoveLine', 'AddPaymentStart',
+    'AddPayment']
 
 _ZERO = Decimal(0)
 
@@ -57,6 +59,8 @@ class StatementLine(metaclass=PoolMeta):
         payments = self._search_payments(amount)
 
         for payment in payments:
+            if payment.state in ('draft', 'failed'):
+                continue
             move_line = MoveLine()
             if payment.line:
                 line_amount = abs(payment.line.debit - payment.line.credit)
@@ -151,7 +155,7 @@ class StatementMoveLine(metaclass=PoolMeta):
             if payments:
                 self.payment = payments[0]
 
-    @fields.depends('payment', 'party', 'account', 'amount','line',
+    @fields.depends('payment', 'party', 'account', 'amount', 'line',
         '_parent_line._parent_statement.journal', '_parent_line.statement',
         methods=['on_change_invoice'])
     def on_change_payment(self):
@@ -236,9 +240,9 @@ class StatementMoveLine(metaclass=PoolMeta):
 
             to_reconcile = defaultdict(list)
             if not self.payment.line:
-                raise UserError(gettext(
-                    'account_bank_statement_payment.payment_without_account_move',
-                    payment=self.payment.rec_name))
+                raise UserError(gettext('account_bank_statement_payment.'
+                        'payment_without_account_move',
+                        payment=self.payment.rec_name))
             lines = move.lines + (self.payment.line,)
             if self.payment.clearing_move:
                 lines += self.payment.clearing_move.lines
@@ -259,7 +263,7 @@ class StatementMoveLine(metaclass=PoolMeta):
                         line.party.id if line.party else None)
                     to_reconcile[key].append(line)
             for lines in list(to_reconcile.values()):
-                if not sum((l.debit - l.credit) for l in lines):
+                if not sum((x.debit - x.credit) for x in lines):
                     MoveLine.reconcile(lines)
         return move
 
@@ -294,7 +298,8 @@ class AddPayment(Wizard):
     'Add Payment'
     __name__ = 'account.bank.statement.payment.add'
     start = StateView('account.bank.statement.payment.add.start',
-        'account_bank_statement_payment.account_bank_statement_payment_add_start', [
+        'account_bank_statement_payment.'
+        'account_bank_statement_payment_add_start', [
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('Add', 'add', 'tryton-ok', default=True),
             ])
