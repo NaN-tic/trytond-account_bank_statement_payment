@@ -204,6 +204,9 @@ class StatementMoveLine(metaclass=PoolMeta):
 
         move = super(StatementMoveLine, self).create_move()
 
+        if not move:
+            return
+
         if self.payment:
             payment_amount = Currency.compute(self.payment.currency,
                 self.payment.amount, self.line.statement.journal.currency)
