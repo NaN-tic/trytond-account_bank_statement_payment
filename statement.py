@@ -37,6 +37,7 @@ class StatementLine(metaclass=PoolMeta):
             ('journal.currency', '=', self.statement_currency),
             ('kind', '=', kind),
             ('total_amount', '=', search_amount),
+            ('company', '=', self.company.id),
             ]
         payments = []
         for group in Group.search(domain):
