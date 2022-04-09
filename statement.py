@@ -54,6 +54,8 @@ class StatementLine(metaclass=PoolMeta):
     def _search_payments_reconciliation(self):
         pool = Pool()
         MoveLine = pool.get('account.bank.statement.move.line')
+        Configuration = pool.get('account.configuration')
+        config = Configuration(1)
 
         amount = self.company_amount - self.moves_amount
         kind = 'receivable' if amount > _ZERO else 'payable'
@@ -72,8 +74,12 @@ class StatementLine(metaclass=PoolMeta):
                     continue
                 move_line.account = payment.line.account
             else:
-                move_line.account = getattr(payment.party, 'account_%s' %
-                    kind)
+                party_account = getattr(payment.party, 'account_%s' % kind)
+                if party_account:
+                    account = party_account
+                else:
+                    account = getattr(config, 'default_account_%s' % kind)
+                move_line.account = account
             move_line.party = payment.party
             move_line.amount = payment.amount
             move_line.date = datetime.date(self.date.year, self.date.month,
