@@ -1,23 +1,19 @@
-# This file is part of the account_bank_statement_payment module for Tryton.
-# The COPYRIGHT file at the top level of this repository contains the full
-# copyright notices and license terms.
+
+# This file is part of Tryton.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
+
 from decimal import Decimal
 import datetime
-import doctest
-import unittest
 from trytond.pool import Pool
-import trytond.tests.test_tryton
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
-from trytond.tests.test_tryton import doctest_teardown
-from trytond.tests.test_tryton import doctest_checker
 
-from trytond.modules.company.tests import create_company, set_company
+from trytond.modules.company.tests import create_company, set_company, CompanyTestMixin
 from trytond.modules.account.tests import create_chart, get_fiscalyear
 from trytond.modules.account_invoice.tests import set_invoice_sequences
 
 
-class AccountBankStatementPaymentTestCase(ModuleTestCase):
-    'Test Account Bank Statement Payment module'
+class AccountBankStatementPaymentTestCase(CompanyTestMixin, ModuleTestCase):
+    'Test AccountBankStatementPayment module'
     module = 'account_bank_statement_payment'
 
     @with_transaction()
@@ -171,13 +167,4 @@ class AccountBankStatementPaymentTestCase(ModuleTestCase):
             self.assertEqual(len(statement_line.lines), 1)
 
 
-def suite():
-    suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
-        AccountBankStatementPaymentTestCase))
-    suite.addTests(doctest.DocFileSuite(
-            'scenario_bank_statement_payment_bank_discount.rst',
-            tearDown=doctest_teardown, encoding='utf-8',
-            checker=doctest_checker,
-            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
-    return suite
+del ModuleTestCase
