@@ -122,7 +122,7 @@ class StatementMoveLine(metaclass=PoolMeta):
                         and clause._condition == Bool(Eval('account'))):
                     clause._condition = (Bool(Eval('account'))
                         & ~Bool(Eval('payment')))
-            cls.invoice.depends.append('payment')
+            cls.invoice.depends.add('payment')
 
     @fields.depends('line', '_parent_line.state')
     def on_change_with_line_state(self, name=None):
