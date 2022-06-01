@@ -97,6 +97,7 @@ class AccountBankStatementPaymentTestCase(CompanyTestMixin, ModuleTestCase):
                                     'party': customer1.id,
                                     'account': receivable.id,
                                     'debit': Decimal('100.0'),
+                                    'maturity_date': Date.today() + datetime.timedelta(days=1)
                                     }]),
                         ],
                     },
@@ -127,7 +128,7 @@ class AccountBankStatementPaymentTestCase(CompanyTestMixin, ModuleTestCase):
 
             self.assertEqual(sum([p.amount for p in payments]),
                 Decimal('110.0'))
-            Payment.approve(payments)
+            Payment.submit(payments)
             group, = Group.create([{
                         'kind': 'receivable',
                         'journal': payment_journal.id,

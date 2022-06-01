@@ -33,6 +33,12 @@ class Journal(metaclass=PoolMeta):
         help='The Bank only advances the Due amount and it recover it at due '
         'date, indepently if the customer pays you.')
 
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.clearing_journal.context = {'company': Eval('company')}
+        cls.clearing_journal.depends.add('company')
+
     @fields.depends('clearing_account', 'clearing_percent', 'advance')
     def on_change_with_clearing_percent(self):
         if self.advance:
@@ -106,11 +112,11 @@ class Payment(metaclass=PoolMeta):
                         if not sum((l.debit - l.credit) for l in lines):
                             Line.reconcile(lines)
 
-    def create_clearing_move(self, date=None):
+    def _get_clearing_move(self, date=None):
         if self.journal.advance:
             # it doesn't create clearing because it's done when bank recover it
             return
-        move = super(Payment, self).create_clearing_move(date=date)
+        move = super(Payment, self)._get_clearing_move(date=date)
         if move and self.journal.clearing_percent < Decimal(1):
             for line in move.lines:
                 line.debit *= self.journal.clearing_percent

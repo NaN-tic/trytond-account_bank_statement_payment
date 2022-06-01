@@ -147,9 +147,9 @@ Create customer invoice payment::
     >>> payment, = Payment.find([])
     >>> payment.amount
     Decimal('100.00')
-    >>> payment.click('approve')
+    >>> payment.click('submit')
     >>> payment.state
-    'approved'
+    'submitted'
     >>> process_payment = Wizard('account.payment.process', [payment])
     >>> process_payment.execute('process')
     >>> payment.reload()
@@ -347,9 +347,9 @@ Create a payment with 80% bank discount for first of them::
     >>> payment2, = Payment.find([('state', '=', 'draft')])
     >>> payment2.amount
     Decimal('200.00')
-    >>> payment2.click('approve')
+    >>> payment2.click('submit')
     >>> payment2.state
-    'approved'
+    'submitted'
     >>> process_payment = Wizard('account.payment.process', [payment2])
     >>> process_payment.execute('process')
     >>> payment2.reload()
@@ -367,9 +367,9 @@ And another payment with 100% bank discount for the second one::
     >>> payment3, = Payment.find([('state', '=', 'draft')])
     >>> payment3.amount
     Decimal('80.00')
-    >>> payment3.click('approve')
+    >>> payment3.click('submit')
     >>> payment3.state
-    'approved'
+    'submitted'
     >>> process_payment = Wizard('account.payment.process', [payment3])
     >>> process_payment.execute('process')
     >>> payment3.reload()
@@ -406,7 +406,7 @@ Create transaction lines on statement lines and post them::
     >>> statement_line4.save()
     >>> statement_line4.click('post')
     >>> st_move_line = statement_line5.lines.new()
-    >>> st_move_line.payment = payment2
+    >>> st_move_line.payment = payment3
     >>> st_move_line.amount
     Decimal('80.00')
     >>> st_move_line.account.name
@@ -465,6 +465,14 @@ The payment of second customer invoice is succeeded::
     >>> customer_invoice2.reload()
     >>> customer_invoice2.state
     'paid'
+
+Check balance::
+
+    >>> receivable.reload()
+    >>> customer_bank_discounts.reload()
+    >>> cash.reload()
+    >>> (receivable.balance , customer_bank_discounts.balance, cash.balance)
+    (Decimal('80.00'), Decimal('-80.00'), Decimal('380.00'))
 
 Create transaction line on statement line with recovering of bank discount for
 third invoice selecting the payment::
