@@ -236,7 +236,8 @@ class StatementMoveLine(metaclass=PoolMeta):
                             and self.amount == -advancement_amount))):
                 Payment.fail([self.payment])
             elif (self.payment.state in ('processing', 'failed')
-                    and ((self.account == self.payment.line.account
+                    and ((self.payment.line
+                            and  self.account == self.payment.line.account
                             and self.amount == pending_amount)
                         or (self.payment.journal.advance
                             and self.account
