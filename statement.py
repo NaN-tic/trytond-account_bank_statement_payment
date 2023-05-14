@@ -234,7 +234,8 @@ class StatementMoveLine(metaclass=PoolMeta):
                     and ((self.amount == -payment_amount)
                         or (advancement_amount
                             and self.amount == -advancement_amount))):
-                Payment.fail([self.payment])
+                with Transaction().set_context(from_account_bank_statement_line=True):
+                    Payment.fail([self.payment])
             elif (self.payment.state in ('processing', 'failed')
                     and ((self.payment.line
                             and  self.account == self.payment.line.account
