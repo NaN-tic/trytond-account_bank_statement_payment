@@ -15,9 +15,9 @@ class MoveLine(metaclass=PoolMeta):
     __name__ = 'account.move.line'
     payment_group = fields.Function(fields.Many2One('account.payment.group',
             'Payment Group'),
-        'get_payment_fields', searcher='search_payment_fields')
+        'get_payment_fields', searcher='search_payment_group')
     payment_date = fields.Function(fields.Date('Payment Date'),
-        'get_payment_fields', searcher='search_payment_fields')
+        'get_payment_fields', searcher='search_payment_date')
 
     @classmethod
     def get_payment_fields(cls, lines, name):
@@ -38,5 +38,9 @@ class MoveLine(metaclass=PoolMeta):
         return result
 
     @classmethod
-    def search_payment_fields(cls, name, clause):
-        return [('payments.%s' % name[8:],) + tuple(clause[1:])]
+    def search_payment_group(cls, name, clause):
+        return [('payments.group.rec_name',) + tuple(clause[1:])]
+
+    @classmethod
+    def search_payment_date(cls, name, clause):
+        return [('payments.date',) + tuple(clause[1:])]
