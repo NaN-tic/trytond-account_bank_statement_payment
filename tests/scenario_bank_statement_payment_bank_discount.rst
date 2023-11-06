@@ -150,8 +150,7 @@ Create customer invoice payment::
     >>> payment.click('submit')
     >>> payment.state
     'submitted'
-    >>> process_payment = Wizard('account.payment.process', [payment])
-    >>> process_payment.execute('process')
+    >>> process_payment = payment.click('process_wizard')
     >>> payment.reload()
     >>> payment.state
     'processing'
@@ -350,8 +349,7 @@ Create a payment with 80% bank discount for first of them::
     >>> payment2.click('submit')
     >>> payment2.state
     'submitted'
-    >>> process_payment = Wizard('account.payment.process', [payment2])
-    >>> process_payment.execute('process')
+    >>> process_payment = payment2.click('process_wizard')
     >>> payment2.reload()
     >>> payment2.state
     'processing'
@@ -370,8 +368,7 @@ And another payment with 100% bank discount for the second one::
     >>> payment3.click('submit')
     >>> payment3.state
     'submitted'
-    >>> process_payment = Wizard('account.payment.process', [payment3])
-    >>> process_payment.execute('process')
+    >>> process_payment = payment3.click('process_wizard')
     >>> payment3.reload()
     >>> payment3.state
     'processing'
