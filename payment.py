@@ -36,7 +36,7 @@ class Journal(metaclass=PoolMeta):
     @classmethod
     def __setup__(cls):
         super().__setup__()
-        cls.clearing_journal.context = {'company': Eval('company')}
+        cls.clearing_journal.context = {'company': Eval('company', -1)}
         cls.clearing_journal.depends.add('company')
 
     @fields.depends('clearing_account', 'clearing_percent', 'advance')
