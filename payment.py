@@ -26,7 +26,7 @@ class Journal(metaclass=PoolMeta):
         states={
             'required': Bool(Eval('clearing_account')),
             'readonly': Eval('advance', False),
-            }, depends=['clearing_account', 'advance'],
+            },
         help='The percentage over the total owed amount that will be moved to '
         'Clearing Accoung when the payment is succeeded.')
     advance = fields.Boolean('Advance',
