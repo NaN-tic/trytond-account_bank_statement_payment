@@ -110,8 +110,7 @@ class StatementMoveLine(metaclass=PoolMeta):
                 If(Eval('amount', 0.0) < 0.0,
                     ('state', 'in', ['processing', 'succeeded']),
                     ('state', 'in', ['processing', 'failed']))),
-            ],
-        depends=['party', 'line_state', 'amount'])
+            ])
 
     @classmethod
     def __setup__(cls):
