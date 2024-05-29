@@ -161,7 +161,7 @@ class AccountBankStatementPaymentTestCase(CompanyTestMixin, ModuleTestCase):
             Statement.confirm([statement])
             statement_line, = statement.lines
             self.assertEqual(statement_line.company_amount, Decimal('110.0'))
-            self.assertEqual(statement_line.moves_amount, Decimal('0.0'))
+            self.assertEqual(statement_line.moves_amount, Decimal(0))
             StatementLine.search_reconcile([statement_line])
             self.assertEqual(statement_line.moves_amount, Decimal('110.0'))
             self.assertEqual(list(statement_line.counterpart_lines), [line])

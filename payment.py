@@ -54,7 +54,7 @@ class Group(metaclass=PoolMeta):
         'get_total_amount', searcher='search_total_amount')
 
     def get_total_amount(self, name=None):
-        amount = Decimal('0.0')
+        amount = Decimal(0)
         for payment in self.payments:
             amount += payment.amount
         return amount
