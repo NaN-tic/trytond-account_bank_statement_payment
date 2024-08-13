@@ -145,6 +145,7 @@ class Test(unittest.TestCase):
         self.assertEqual(payment.amount, Decimal('100.00'))
         payment.click('submit')
         self.assertEqual(payment.state, 'submitted')
+        payment.click('process_wizard')
         payment.reload()
         self.assertEqual(payment.state, 'processing')
 
