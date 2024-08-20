@@ -146,7 +146,6 @@ class Test(unittest.TestCase):
         payment.click('submit')
         self.assertEqual(payment.state, 'submitted')
         payment.click('process_wizard')
-        payment.reload()
         self.assertEqual(payment.state, 'processing')
 
         # Check invoice is still pending to pay so the amount is in customer's debit account
@@ -295,7 +294,7 @@ class Test(unittest.TestCase):
         self.assertEqual(payment2.amount, Decimal('200.00'))
         payment2.click('submit')
         self.assertEqual(payment2.state, 'submitted')
-        payment2.reload()
+        payment2.click('process_wizard')
         self.assertEqual(payment2.state, 'processing')
 
         # And another payment with 100% bank discount for the second one
@@ -310,7 +309,7 @@ class Test(unittest.TestCase):
         self.assertEqual(payment3.amount, Decimal('80.00'))
         payment3.click('submit')
         self.assertEqual(payment3.state, 'submitted')
-        payment3.reload()
+        payment3.click('process_wizard')
         self.assertEqual(payment3.state, 'processing')
 
         # Create and confirm bank statement
