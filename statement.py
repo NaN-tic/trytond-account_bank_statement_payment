@@ -351,7 +351,7 @@ class AddPayment(Wizard):
                 bsmove_line.account = bsmove_line.account or account
                 bsmove_line.description = payment.description
                 # bsmove_line.move =
-                to_create.append(bsmove_line._save_values)
+                to_create.append(bsmove_line._save_values())
 
         if to_create:
             BSMoveLine.create(to_create)
