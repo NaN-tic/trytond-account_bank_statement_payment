@@ -50,19 +50,25 @@ class AccountBankStatementPaymentTestCase(CompanyTestMixin, ModuleTestCase):
                     ])
             revenue, = Account.search([
                     ('type.revenue', '=',True),
-                    ])
+                    ('closed', '=', False),
+                    ], limit=1)
             receivable, = Account.search([
                     ('type.receivable', '=', True),
-                    ])
+                    ('closed', '=', False),
+                    ], limit=1)
             expense, = Account.search([
                     ('type.expense', '=', True),
-                    ])
+                    ('closed', '=', False),
+                    ], limit=1)
             payable, = Account.search([
                     ('type.payable', '=', True),
-                    ])
+                    ('closed', '=', False),
+                    ], limit=1)
             cash, = Account.search([
-                    ('name', '=', 'Main Cash'),
-                    ])
+                    # ('name', '=', 'Main Cash'),
+                    ('code', '=', '1.1.1'),
+                    ('closed', '=', False),
+                    ], limit=1)
             cash.bank_reconcile = True
             cash.save()
             #Create some parties
