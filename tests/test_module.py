@@ -65,8 +65,7 @@ class AccountBankStatementPaymentTestCase(CompanyTestMixin, ModuleTestCase):
                     ('closed', '=', False),
                     ], limit=1)
             cash, = Account.search([
-                    # ('name', '=', 'Main Cash'),
-                    ('code', '=', '1.1.1'),
+                    ('code', '=', '1.1.1'), # Main Cash
                     ('closed', '=', False),
                     ], limit=1)
             cash.bank_reconcile = True
