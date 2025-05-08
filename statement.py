@@ -349,7 +349,7 @@ class AddPayment(Wizard):
                 bsmove_line.amount = bsmove_line.amount or payment.amount
                 bsmove_line.party = bsmove_line.party or payment.party
                 bsmove_line.account = bsmove_line.account or account
-                bsmove_line.description = payment.description
+                bsmove_line.description = payment.reference
                 # bsmove_line.move =
                 to_create.append(bsmove_line._save_values())
 
