@@ -85,7 +85,7 @@ class StatementLine(metaclass=PoolMeta):
             move_line.date = datetime.date(self.date.year, self.date.month,
                 self.date.day)
             move_line.line = self
-            move_line.description = payment.description
+            move_line.description = payment.reference
             move_line.save()
 
     def _search_reconciliation(self):
