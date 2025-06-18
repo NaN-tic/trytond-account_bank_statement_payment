@@ -10,9 +10,9 @@ from configparser import ConfigParser
 MODULE = 'account_bank_statement_payment'
 PREFIX = 'nantic'
 MODULE2PREFIX = {
-    'account_bank_statement',
-    'account_bank_statement_counterpart',
-    'account_bank_statement_account',
+    'account_bank_statement': 'nantic',
+    'account_bank_statement_counterpart': 'nantic',
+    'account_bank_statement_account': 'nantic',
 }
 
 
@@ -81,7 +81,7 @@ setup(name='%s_%s' % (PREFIX, MODULE),
         ],
     package_data={
         'trytond.modules.%s' % MODULE: (info.get('xml', [])
-            + ['tryton.cfg', 'locale/*.po', 'tests/*.rst']),
+            + ['tryton.cfg', 'view/*.xml', 'locale/*.po', 'tests/*.rst']),
         },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
